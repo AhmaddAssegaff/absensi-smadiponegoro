@@ -3,23 +3,23 @@ import { MetaHead } from "@/components/head/metaHead";
 import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 
-const pageContainerVariants = cva(
-  "flex min-h-screen w-full items-center justify-center px-4 py-8 md:px-8 lg:px-16",
-  {
-    variants: {
-      variantBg: {
-        primary: "pageContainerBG-primary",
-        secondary: "pageContainerBG-secondary",
-      },
+const pageContainer = cva("min-h-screen w-full px-4 py-8 md:px-8 lg:px-16", {
+  variants: {
+    variantBg: {
+      primary: "pageContainerBG-primary",
+      secondary: "pageContainerBG-secondary",
     },
-    defaultVariants: {
-      variantBg: "primary",
+    center: {
+      true: "flex items-center justify-center",
+      false: "",
     },
   },
-);
+  defaultVariants: {
+    variantBg: "primary",
+  },
+});
 
-interface PageContainerProps
-  extends VariantProps<typeof pageContainerVariants> {
+interface PageContainerProps extends VariantProps<typeof pageContainer> {
   children: ReactNode;
   title?: string;
   description?: string;
@@ -38,6 +38,7 @@ export const PageContainer = ({
   ogImage,
   ogUrl,
   variantBg,
+  center,
 }: PageContainerProps) => {
   return (
     <>
@@ -49,7 +50,7 @@ export const PageContainer = ({
         ogImage={ogImage}
         ogUrl={ogUrl}
       />
-      <main className={cn(pageContainerVariants({ variantBg }))}>
+      <main className={cn(pageContainer({ variantBg, center }))}>
         <div className="mx-auto max-w-5xl">{children}</div>
       </main>
     </>
