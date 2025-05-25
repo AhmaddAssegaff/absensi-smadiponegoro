@@ -8,11 +8,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
-import { useSearchParams } from "next/navigation";
-
+import { useQueryParams } from "@/hooks/useQueryParams";
+import { buildOrderedQuery } from "@/helper/queryPaginationHelpers";
 import { type Role } from "@prisma/client";
 import { type ClassName } from "@prisma/client";
 
@@ -65,57 +71,63 @@ export const DataTable = ({
   Pagination: PaginationMeta;
 }) => {
   const router = useRouter();
-  const queryParams = useSearchParams();
 
-  const currentPage = Math.max(1, Number(queryParams.get("page") ?? "1"));
-  const currentSortBy = queryParams.get("sortBy") ?? "createdAt";
-  const currentOrder = queryParams.get("order") ?? "desc";
+  const { currentLimit, currentPage, currentSortBy, currentOrder, rawParams } =
+    useQueryParams();
 
-  const handleChangePage = (newPage: number) => {
-    void router.push({
-      href: router.asPath,
-      query: {
-        page: newPage,
-      },
-    });
+  const { page, total, totalPages } = Pagination;
+
+  const query = buildOrderedQuery(rawParams);
+
+  const handlePageChange = (newPage: number) => {
+    void router.replace(
+      `?${new URLSearchParams({ ...query, page: String(newPage) }).toString()}`,
+    );
   };
 
-  const handleSort = (column: string) => {
-    const newOrder =
-      currentSortBy === column && currentOrder === "asc" ? "desc" : "asc";
+  const handleLimitChange = (newLimit: number) => {
+    void router.replace(
+      `?${new URLSearchParams({ ...query, limit: String(newLimit), page: "1" }).toString()}`,
+    );
+  };
 
-    void router.push({
-      pathname: router.pathname,
-      query: {
-        ...Object.fromEntries(queryParams.entries()),
-        sortBy: column,
-        order: newOrder,
-        page: 1,
-      },
-    });
+  const handleSort = (sortBy: string) => {
+    const newOrder =
+      currentSortBy === sortBy && currentOrder === "asc" ? "desc" : "asc";
+    void router.replace(
+      `?${new URLSearchParams({ ...query, sortBy, order: newOrder }).toString()}`,
+    );
   };
 
   useEffect(() => {
-    if (router.isReady) {
-      const { page, sortBy, order } = router.query;
+    if (!router.isReady) return;
 
-      if (!page || !sortBy || !order) {
-        void router.replace(
-          {
-            pathname: router.pathname,
-            query: {
-              limit: 10,
-              page: page ?? 1,
-              sortBy: sortBy ?? "createdAt",
-              order: order ?? "asc",
-            },
-          },
-          undefined,
-          { shallow: true },
-        );
-      }
+    const { page, sortBy, order, limit } = router.query;
+
+    const fixedQuery = {
+      page: page ?? "1",
+      limit: limit ?? "10",
+      sortBy: sortBy ?? "createdAt",
+      order: order ?? "desc",
+    };
+
+    const queryChanged =
+      page !== fixedQuery.page ||
+      limit !== fixedQuery.limit ||
+      sortBy !== fixedQuery.sortBy ||
+      order !== fixedQuery.order;
+
+    if (queryChanged) {
+      void router.replace(
+        {
+          pathname: router.pathname,
+          query: fixedQuery,
+        },
+        undefined,
+        { shallow: true },
+      );
     }
-  }, [currentPage, router]);
+  }, [router, router.isReady, router.query]);
 
   return (
     <div className="rounded-md border bg-slate-800 p-4 text-white">
@@ -156,29 +168,47 @@ export const DataTable = ({
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex gap-2">
-          {currentPage > 1 && (
-            <Button onClick={() => handleChangePage(currentPage - 1)}>
-              Prev Page
-            </Button>
-          )}
-          {currentPage <= 1 && (
-            <Button onClick={() => handleChangePage(currentPage + 1)}>
-              Next Page
-            </Button>
-          )}
+          <Button
+            variant={currentPage > 1 ? "default" : "ghost"}
+            disabled={currentPage <= 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            Prev Page
+          </Button>
+
+          <Button
+            variant={currentPage < totalPages ? "default" : "ghost"}
+            disabled={currentPage >= totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            Next Page
+          </Button>
+
+          <Select
+            onValueChange={(value) => handleLimitChange(Number(value))}
+            value={String(currentLimit)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Size PerPage" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="15">15</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex select-none gap-6 text-sm">
           <p>
-            Halaman: <span className="font-semibold">{Pagination.page}</span>
+            Halaman: <span className="font-semibold">{page}</span>
           </p>
           <p>
-            Total data:{" "}
-            <span className="font-semibold">{Pagination.total}</span>
+            Total data: <span className="font-semibold">{total}</span>
           </p>
           <p>
-            Total halaman:{" "}
-            <span className="font-semibold">{Pagination.totalPages}</span>
+            Total halaman: <span className="font-semibold">{totalPages}</span>
           </p>
         </div>
       </div>

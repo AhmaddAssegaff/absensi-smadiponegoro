@@ -22,7 +22,7 @@ export default function DashboardAdminPage() {
 
   const order: Order = validOrder.includes(orderParam as Order)
     ? (orderParam as Order)
-    : "asc";
+    : "desc";
 
   const { data, isLoading, error } = api.admin.getAllTeacher.useQuery({
     limit: 10,

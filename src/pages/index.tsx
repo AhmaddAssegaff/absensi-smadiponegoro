@@ -7,11 +7,6 @@ import { Footer } from "@/components/layout/footer";
 import { api } from "@/utils/api";
 
 export default function Home() {
-  const {
-    data: teacher,
-    isLoading,
-    error,
-  } = api.admin.getAllTeacher.useQuery();
   const { data: sessionData } = useSession();
 
   return (
@@ -32,13 +27,6 @@ export default function Home() {
             >
               {sessionData ? "Sign out" : "Sign in"}
             </Button>
-          </div>
-          <div>
-            {teacher?.map((teacher) => (
-              <li className="text-2xl text-black" key={teacher.id}>
-                {teacher.name} - NISN: {teacher.nisn} - Role: {teacher.role}
-              </li>
-            ))}
           </div>
         </SectionContiner>
       </PageContainer>
