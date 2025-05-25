@@ -27,6 +27,7 @@ interface PageContainerProps extends VariantProps<typeof pageContainer> {
   author?: string;
   ogImage?: string;
   ogUrl?: string;
+  className?: string;
 }
 
 export const PageContainer = ({
@@ -39,6 +40,7 @@ export const PageContainer = ({
   ogUrl,
   variantBg,
   center,
+  className,
 }: PageContainerProps) => {
   return (
     <>
@@ -50,7 +52,7 @@ export const PageContainer = ({
         ogImage={ogImage}
         ogUrl={ogUrl}
       />
-      <main className={cn(pageContainer({ variantBg, center }))}>
+      <main className={cn(pageContainer({ variantBg, center, className }))}>
         <div className="mx-auto max-w-5xl">{children}</div>
       </main>
     </>

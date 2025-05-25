@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { PageContainer } from "@/components/layout/pageContainer";
 import { useSearchParams } from "next/navigation";
+import { withLayout } from "@/components/utils/withLayout";
 
 export default function SignInPage() {
   const formSchema = z.object({
@@ -55,7 +56,7 @@ export default function SignInPage() {
   }
 
   return (
-    <PageContainer variantBg={"secondary"}>
+    <PageContainer className="z-50" center={true} variantBg={"secondary"}>
       <Card className="w-[400px]">
         <CardHeader>
           <CardTitle className="text-center">

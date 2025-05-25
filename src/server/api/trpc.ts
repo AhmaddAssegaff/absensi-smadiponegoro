@@ -148,13 +148,58 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (!ctx.session || !ctx.session.user) {
+    if (!ctx.session?.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({
       ctx: {
         // infers the `session` as non-nullable
         session: { ...ctx.session, user: ctx.session.user },
+      },
+    });
+  });
+
+export const adminProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    const user = ctx.session?.user;
+
+    if (!user || user.role !== "ADMIN") {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    return next({
+      ctx: {
+        session: ctx.session,
+      },
+    });
+  });
+
+export const teacherProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    const user = ctx.session?.user;
+
+    if (!user || user.role !== "TEACHER") {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    return next({
+      ctx: {
+        session: ctx.session,
+      },
+    });
+  });
+
+export const studentProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    const user = ctx.session?.user;
+
+    if (!user || user.role !== "STUDENT") {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    return next({
+      ctx: {
+        session: ctx.session,
       },
     });
   });
