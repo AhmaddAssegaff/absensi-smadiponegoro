@@ -23,6 +23,7 @@ model User {
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  deviceId        String
 
   class           Class?    @relation("SiswaKelas", fields: [classId], references: [id])
   classId         String?
@@ -48,6 +49,7 @@ model Attendance {
   userId    String
   date      DateTime
   status    AttendanceStatus
+  description String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -71,8 +73,13 @@ enum ClassName {
 }
 
 enum AttendanceStatus {
-  PRESENT
-  SICK
-  PERMIT
+  HADIR_TEPAT_WAKTU
+  HADIR_TERLAMBAT
+  IZIN_SAKIT
+  IZIN
+  HADIR_DAN_IZIN_SAKIT
+  HADIR_DAN_IZIN_TERLAMBAT
+  HADIR_DAN_KELUAR_DENGAN_IZIN
+  HADIR_DAN_KELUAR_TANPA_IZIN
   ALPA
 }
