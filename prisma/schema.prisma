@@ -31,6 +31,8 @@ model User {
   homeroomFor     Class[]   @relation("WaliKelas")
 
   attendances     Attendance[]
+
+  AttendanceSummary AttendanceSummary[]
 }
 
 model Class {
@@ -55,6 +57,34 @@ model Attendance {
   updatedAt DateTime  @updatedAt
 
   @@unique([userId, date])
+}
+
+model AttendanceSummary {
+  id               String   @id @default(uuid())
+  user             User     @relation(fields: [userId], references: [id])
+  userId           String
+  classId          String?
+
+  year             Int
+  month            Int
+  // yearMonth    String buat query tambah gampang
+
+  hadirTepat       Int      @default(0)
+  hadirTerlambat   Int      @default(0)
+  izin             Int      @default(0)
+  sakit            Int      @default(0)
+  alpa             Int      @default(0)
+  keluarIzin       Int      @default(0)
+  keluarTanpaIzin  Int      @default(0)
+
+  totalHadir       Int      @default(0)
+  totalTidakHadir  Int      @default(0)
+  totalHari        Int      @default(0)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([userId, year, month])
 }
 
 enum Role {
