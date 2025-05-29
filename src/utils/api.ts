@@ -10,6 +10,7 @@ import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import superjson from "superjson";
 
 import { type AppRouter } from "@/server/api/root";
+import { keepPreviousData } from "@tanstack/react-query";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
@@ -47,14 +48,11 @@ export const api = createTRPCNext<AppRouter>({
         defaultOptions: {
           queries: {
             refetchOnWindowFocus: false,
-            queries: {
-              refetchOnWindowFocus: false,
-              refetchOnMount: false,
-              refetchOnReconnect: false,
-              keepPreviousData: true,
-              staleTime: 1000 * 20, // 20second
-              cacheTime: 1000 * 60 * 30, // 30minute
-            },
+            refetchOnMount: false,
+            refetchOnReconnect: false,
+            keepPreviousData: true,
+            staleTime: 1000 * 20, // 20second
+            cacheTime: 1000 * 60 * 30, // 30minute
           },
         },
       },

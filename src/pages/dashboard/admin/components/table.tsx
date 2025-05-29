@@ -8,19 +8,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
 import { useQueryParams } from "@/hooks/useQueryParams";
 import { buildOrderedQuery } from "@/helper/queryPaginationHelpers";
 import { type Role } from "@prisma/client";
 import { type ClassName } from "@prisma/client";
+import { api } from "@/utils/api";
+import Link from "next/link";
 
 type User = {
   id: string;
@@ -30,7 +25,6 @@ type User = {
   updatedAt: Date;
   nisn: string;
   passwordHash: string;
-  isActive: boolean;
   classId: string | null;
 
   homeroomFor?: {
@@ -72,7 +66,7 @@ export const DataTable = ({
 }) => {
   const router = useRouter();
 
-  const { currentLimit, currentPage, currentSortBy, currentOrder, rawParams } =
+  const { currentPage, currentSortBy, currentOrder, rawParams } =
     useQueryParams();
 
   const { page, total, totalPages } = Pagination;
@@ -82,12 +76,6 @@ export const DataTable = ({
   const handlePageChange = (newPage: number) => {
     void router.replace(
       `?${new URLSearchParams({ ...query, page: String(newPage) }).toString()}`,
-    );
-  };
-
-  const handleLimitChange = (newLimit: number) => {
-    void router.replace(
-      `?${new URLSearchParams({ ...query, limit: String(newLimit), page: "1" }).toString()}`,
     );
   };
 
@@ -151,7 +139,11 @@ export const DataTable = ({
         <TableBody>
           {users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell>{user.name ?? "-"}</TableCell>
+              <TableCell>
+                <Link href={`/dashboard/admin/user/${user.id}`}>
+                  {user.name ?? "-"}
+                </Link>
+              </TableCell>
               <TableCell>{user.nisn}</TableCell>
               <TableCell>{user.role}</TableCell>
               <TableCell>{user.homeroomFor?.[0]?.name ?? "-"}</TableCell>
@@ -183,21 +175,6 @@ export const DataTable = ({
           >
             Next Page
           </Button>
-
-          <Select
-            onValueChange={(value) => handleLimitChange(Number(value))}
-            value={String(currentLimit)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Size PerPage" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="5">5</SelectItem>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="15">15</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="flex select-none gap-6 text-sm">

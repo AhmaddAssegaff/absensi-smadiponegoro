@@ -23,7 +23,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { PageContainer } from "@/components/layout/pageContainer";
 import { useSearchParams } from "next/navigation";
-import { withLayout } from "@/components/utils/withLayout";
 
 export default function SignInPage() {
   const formSchema = z.object({
