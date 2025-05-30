@@ -25,14 +25,15 @@ import { useEffect } from "react";
 
 const classNames = Object.values(ClassName) as [ClassName, ...ClassName[]];
 
-const formSchema = z.object({
-  name: z.string().optional(),
-  nisn: z.string().optional(),
-  password: z.string().optional(),
-  classNames: z.array(z.enum(classNames)).optional(),
+const updateTeacherInput = z.object({
+  id: z.string(),
+  name: z.string().min(1).optional(),
+  nisn: z.string().min(1).optional(),
+  password: z.string().min(6).optional(),
+  classNames: z.array(z.nativeEnum(ClassName)).optional(),
 });
 
-type FormSchemaType = z.infer<typeof formSchema>;
+type FormSchemaType = z.infer<typeof updateTeacherInput>;
 
 export default function DetailUserTeacher() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function DetailUserTeacher() {
   });
 
   const form = useForm<FormSchemaType>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(updateTeacherInput),
   });
 
   const { mutate, isPending } = api.admin.updateUser.useMutation({
