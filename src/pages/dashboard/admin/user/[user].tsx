@@ -15,22 +15,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import { ClassName } from "@prisma/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PageContainer } from "@/components/layout/pageContainer";
+import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
 
 const classNames = Object.values(ClassName) as [ClassName, ...ClassName[]];
 
 const formSchema = z.object({
-  className: z.enum(classNames, {
-    errorMap: () => ({ message: "Pilih kelas terlebih dahulu" }),
-  }),
+  name: z.string().optional(),
+  nisn: z.string().optional(),
+  password: z.string().optional(),
+  classNames: z.array(z.enum(classNames)).optional(),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -39,83 +38,225 @@ export default function DetailUserTeacher() {
   const router = useRouter();
   const { user: userId } = router.query;
 
+  const {
+    data: userData,
+    isLoading,
+    isError,
+    refetch,
+  } = api.admin.getUserById.useQuery({
+    id: userId as string,
+  });
+
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
   });
 
-  const { mutate, isPending } = api.admin.changeTeacherHomeRoom.useMutation({
+  const { mutate, isPending } = api.admin.updateUser.useMutation({
     onSuccess: () => {
       toast({
-        title: "Berhasil mengubah",
-        description: "Berhasil mengubah wali kelas",
+        title: "Berhasil",
+        description: "Data wali kelas berhasil diubah.",
       });
+      void refetch();
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: "Gagal",
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: FormSchemaType) => {
-    if (!userId || typeof userId !== "string") {
-      toast({
-        title: "Error",
-        description: "User ID tidak tersedia",
-        variant: "destructive",
-      });
-      return;
-    }
+  const onSubmit = (values: FormSchemaType) => {
+    if (!userId || typeof userId !== "string" || !userData) return;
 
-    mutate({ userId, className: data.className });
+    mutate({
+      id: userId,
+      name: values.name ?? userData.name,
+      nisn: values.nisn ?? userData.nisn,
+      ...(values.password ? { password: values.password } : {}),
+      classNames: values.classNames?.length
+        ? values.classNames
+        : userData.homeRoomFor?.map((ClassName) => ClassName.name),
+    });
   };
 
-  const { data, isLoading, isError } = api.admin.getUserById.useQuery({
-    id: userId,
-  });
-
-  console.log(data);
+  useEffect(() => {
+    if (userData) {
+      form.reset({
+        name: userData.name ?? "",
+        nisn: userData.nisn ?? "",
+        password: "",
+        classNames:
+          userData.homeRoomFor?.map((ClassName) => ClassName.name) ?? [],
+      });
+    }
+  }, [userData, form]);
 
   return (
-    <main className="mx-auto max-w-md rounded bg-white p-4 shadow">
-      <h1 className="mb-4 text-2xl font-bold">Ubah Wali Kelas</h1>
+    <PageContainer variantBg="secondary">
+      <div className="mx-auto max-w-2xl space-y-6">
+        <div className="mb-6 text-center">
+          <h1 className="mb-1 text-3xl font-bold text-foreground">
+            Detail Wali Kelas
+          </h1>
+          <p className="text-muted-foreground">
+            Lihat informasi wali kelas secara ringkas.
+          </p>
+        </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="className"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Pilih Wali Kelas</FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih kelas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {classNames.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-                <FormDescription>
-                  Kamu bisa mengubah wali kelas untuk user ini.
-                </FormDescription>
-              </FormItem>
+        <Card className="rounded-xl border border-border bg-background shadow-md">
+          <CardHeader>
+            <CardTitle className="text-xl">Informasi Pengguna</CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 pb-8 text-muted-foreground">
+            {isLoading ? (
+              <Skeleton className="h-40 w-full" />
+            ) : isError || !userData ? (
+              <p className="text-sm text-red-500">Gagal memuat data user.</p>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Nama:</p>
+                  <p>{userData.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">NISN:</p>
+                  <p>{userData.nisn}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    Kelas Diampu:
+                  </p>
+                  <p>
+                    {userData.homeRoomFor?.map((k) => k.name).join(", ") || "-"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Role:</p>
+                  <p>{userData.role}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Dibuat:</p>
+                  <p>
+                    {new Date(userData.createdAt).toLocaleDateString("id-ID")}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Diubah:</p>
+                  <p>
+                    {new Date(userData.updatedAt).toLocaleDateString("id-ID")}
+                  </p>
+                </div>
+              </div>
             )}
-          />
-          <Button type="submit" disabled={isPending}>
-            {isPending ? "Menyimpan..." : "Simpan"}
-          </Button>
-        </form>
-      </Form>
-    </main>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl border border-border bg-background shadow-md">
+          <CardHeader>
+            <CardTitle className="text-xl">Ubah Informasi Akun</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 px-6 pb-8 pt-6">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nama</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nama lengkap" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="nisn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>NISN</FormLabel>
+                      <FormControl>
+                        <Input placeholder="NISN" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Kosongkan jika tidak diubah"
+                          type="password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="classNames"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kelas Wali</FormLabel>
+                      <div className="grid grid-cols-2 gap-2 text-left">
+                        {classNames.map((className) => (
+                          <label
+                            key={className}
+                            className="flex items-center gap-2"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={
+                                field.value?.includes(className) ?? false
+                              }
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.checked
+                                    ? [...(field.value ?? []), className]
+                                    : (field.value ?? []).filter(
+                                        (v) => v !== className,
+                                      ),
+                                )
+                              }
+                            />
+                            <span>{className}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <FormDescription>
+                        Pilih satu atau beberapa kelas.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" disabled={isPending} className="w-full">
+                  {isPending ? "Menyimpan..." : "Simpan"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </PageContainer>
   );
 }

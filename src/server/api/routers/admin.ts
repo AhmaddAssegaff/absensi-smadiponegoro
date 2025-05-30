@@ -2,6 +2,7 @@ import { adminProcedure, createTRPCRouter } from "../trpc";
 import { z } from "zod";
 import { ClassName, Role } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import bcrypt from "bcryptjs";
 
 const getAllTeacherInput = z.object({
   page: z.number().min(1).default(1),
@@ -10,9 +11,21 @@ const getAllTeacherInput = z.object({
   order: z.enum(["asc", "desc"]).default("desc"),
 });
 
+const updateTeacherInput = z.object({
+  id: z.string(),
+  name: z.string().min(1).optional(),
+  nisn: z.string().min(1).optional(),
+  password: z.string().min(6).optional(),
+  classNames: z.array(z.nativeEnum(ClassName)).optional(),
+});
+
 const getUserById = z.object({
   id: z.string(),
 });
+
+async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 10);
+}
 
 export const AdminRouter = createTRPCRouter({
   getAllTeacher: adminProcedure
@@ -29,15 +42,11 @@ export const AdminRouter = createTRPCRouter({
       const [total, users] = await Promise.all([
         ctx.db.user.count({ where }),
         ctx.db.user.findMany({
-          include: {
-            homeRoomFor: true,
-          },
+          include: { homeRoomFor: true },
           where,
           skip: (page - 1) * limit,
           take: limit,
-          orderBy: {
-            [sortBy]: order,
-          },
+          orderBy: { [sortBy]: order },
         }),
       ]);
 
@@ -54,9 +63,7 @@ export const AdminRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUnique({
         where: { id: input.id },
-        include: {
-          homeRoomFor: true,
-        },
+        include: { homeRoomFor: true },
       });
 
       if (!user) {
@@ -69,37 +76,65 @@ export const AdminRouter = createTRPCRouter({
       return user;
     }),
 
-  changeTeacherHomeRoom: adminProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        className: z.nativeEnum(ClassName),
-      }),
-    )
+  updateUser: adminProcedure
+    .input(updateTeacherInput)
     .mutation(async ({ ctx, input }) => {
-      const { userId, className } = input;
+      const { id, name, nisn, password, classNames } = input;
 
-      const kelas = await ctx.db.class.findUnique({
-        where: { name: className },
+      const user = await ctx.db.user.findUnique({
+        where: { id },
+        include: { homeRoomFor: true },
       });
 
-      if (!kelas) {
+      if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Kelas tidak ditemukan",
+          message: "User tidak ditemukan",
         });
       }
 
-      return await ctx.db.class.update({
-        where: { id: kelas.id },
-        data: {
-          homerooms: {
-            connect: { id: userId },
-          },
-        },
-        include: {
-          homerooms: true,
-        },
+      const dataToUpdate: {
+        name?: string;
+        nisn?: string;
+        passwordHash?: string;
+      } = {};
+
+      if (name) dataToUpdate.name = name;
+      if (nisn) dataToUpdate.nisn = nisn;
+      if (password) dataToUpdate.passwordHash = await hashPassword(password);
+
+      return await ctx.db.$transaction(async (tx) => {
+        await tx.user.update({
+          where: { id },
+          data: dataToUpdate,
+        });
+
+        if (classNames?.length) {
+          const classes = await tx.class.findMany({
+            where: { name: { in: classNames } },
+          });
+
+          if (classes.length !== classNames.length) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "Beberapa kelas tidak ditemukan",
+            });
+          }
+
+          await tx.user.update({
+            where: { id },
+            data: {
+              homeRoomFor: {
+                set: classes.map((c) => ({ id: c.id })),
+              },
+            },
+          });
+        }
+
+        return tx.user.findUnique({
+          where: { id },
+          include: { homeRoomFor: true },
+        });
       });
     }),
 });
