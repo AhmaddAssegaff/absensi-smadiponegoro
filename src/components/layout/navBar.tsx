@@ -7,9 +7,6 @@ export const Navbar = () => {
   const role = session?.user.role;
   const normalizedRole = role?.toLowerCase();
 
-  console.log("Session:", session);
-  console.log("Role:", role);
-
   const dashboardPaths: Record<string, string> = {
     student: "/dashboard/murid",
     teacher: "/dashboard/guru",

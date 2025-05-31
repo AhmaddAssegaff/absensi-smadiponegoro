@@ -24,6 +24,7 @@ import { signIn } from "next-auth/react";
 import { PageContainer } from "@/components/layout/pageContainer";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { SectionContiner } from "@/components/layout/sectionContiner";
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -71,61 +72,63 @@ export default function SignInPage() {
 
   return (
     <PageContainer className="z-50" center={true} variantBg={"secondary"}>
-      <Card className="w-[400px]">
-        <CardHeader>
-          <CardTitle className="text-center">
-            Welcome To Sistem Absensi Smadip
-          </CardTitle>
-          <CardDescription className="text-center">
-            Silahkan Login
-          </CardDescription>
-        </CardHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="nisn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>NISN / Kode guru</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Masukkan NISN" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      NISN / Kode guru kamu untuk login.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Masukkan password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>Password akun kamu.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? "Loading..." : "Submit"}
-              </Button>
-            </CardFooter>
-          </form>
-        </Form>
-      </Card>
+      <SectionContiner>
+        <Card className="w-[400px]">
+          <CardHeader>
+            <CardTitle className="text-center">
+              Welcome To Sistem Absensi Smadip
+            </CardTitle>
+            <CardDescription className="text-center">
+              Silahkan Login
+            </CardDescription>
+          </CardHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="nisn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>NISN / Kode guru</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Masukkan NISN" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        NISN / Kode guru kamu untuk login.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Masukkan password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Password akun kamu.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+              <CardFooter>
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading ? "Loading..." : "Submit"}
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
+        </Card>
+      </SectionContiner>
     </PageContainer>
   );
 }

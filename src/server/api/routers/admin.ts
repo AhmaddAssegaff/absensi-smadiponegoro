@@ -42,7 +42,6 @@ export const AdminRouter = createTRPCRouter({
       const [total, users] = await Promise.all([
         ctx.db.user.count({ where }),
         ctx.db.user.findMany({
-          include: { homeRoomFor: true },
           where,
           skip: (page - 1) * limit,
           take: limit,

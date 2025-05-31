@@ -2,6 +2,7 @@ import { PageContainer } from "@/components/layout/pageContainer";
 import { api } from "@/utils/api";
 import { DataTable } from "./components/table";
 import { useSearchParams } from "next/navigation";
+import { SectionContiner } from "@/components/layout/sectionContiner";
 
 export default function DashboardAdminPage() {
   const queryParams = useSearchParams();
@@ -32,25 +33,35 @@ export default function DashboardAdminPage() {
   });
 
   return (
-    <PageContainer variantBg={"secondary"}>
-      {error && <p>Error: {error.message}</p>}
-      <DataTable
-        isLoading={isLoading}
-        Pagination={
-          data
-            ? {
-                page: data.page,
-                total: data.total,
-                totalPages: data.totalPages,
-              }
-            : {
-                page: 1,
-                total: 0,
-                totalPages: 1,
-              }
-        }
-        users={data?.data ?? []}
-      />
+    <PageContainer center={true} variantBg={"secondary"}>
+      <SectionContiner>
+        <div className="mb-6 text-center">
+          <h1 className="mb-1 text-3xl font-bold text-foreground">
+            List User Teacher & Admin
+          </h1>
+          <p className="text-muted-foreground">
+            Lihat informasi User secara ringkas.
+          </p>
+        </div>
+        {error && <p>Error: {error.message}</p>}
+        <DataTable
+          isLoading={isLoading}
+          Pagination={
+            data
+              ? {
+                  page: data.page,
+                  total: data.total,
+                  totalPages: data.totalPages,
+                }
+              : {
+                  page: 1,
+                  total: 0,
+                  totalPages: 1,
+                }
+          }
+          users={data?.data ?? []}
+        />
+      </SectionContiner>
     </PageContainer>
   );
 }

@@ -12,10 +12,10 @@ interface MetaProps {
 }
 
 export const MetaHead: React.FC<MetaProps> = ({
-  title = "default title",
+  title = "SMA Islam Diponegoro Surkarta",
   description = "default description",
   keywords = "default keyword",
-  author = "author",
+  author = "SMA Islam Diponegoro Surkarta",
   ogTitle,
   ogDescription,
   ogImage = "/default-image.png",

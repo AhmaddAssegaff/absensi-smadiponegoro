@@ -85,7 +85,7 @@ export const DataTable = ({
     <div className="sectionContainerBG rounded-lg border p-6 font-semibold text-black shadow-lg">
       <Table className="min-w-full">
         <TableCaption className="py-2 text-center text-black">
-          Daftar user.
+          Click Nama untuk melihat lebih detail
         </TableCaption>
         <TableHeader>
           <TableRow>
