@@ -60,6 +60,7 @@ export default function SignInPage() {
 
       window.location.href = res.url ?? "/";
     } else {
+      setIsLoading(false);
       toast({
         title: "Gagal Sign-in",
         description: "NISN atau password salah.",

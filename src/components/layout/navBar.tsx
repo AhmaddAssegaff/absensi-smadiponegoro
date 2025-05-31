@@ -1,41 +1,48 @@
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Button } from "../ui/button";
 import Link from "next/link";
+import { Button } from "../ui/button";
 
 export const Navbar = () => {
-  const { data: sessionData } = useSession();
+  const { data: session, status } = useSession();
+  const role = session?.user.role;
+  const normalizedRole = role?.toLowerCase();
 
-  const roleUser = sessionData?.user.role;
+  console.log("Session:", session);
+  console.log("Role:", role);
 
-  const roleDashboardMap: Record<string, string> = {
+  const dashboardPaths: Record<string, string> = {
     student: "/dashboard/murid",
     teacher: "/dashboard/guru",
     admin: "/dashboard/admin",
   };
 
-  const dashboardUrl = roleUser ? roleDashboardMap[roleUser] : "/";
-
   return (
-    <>
-      <nav className="pageContainerBG-primary container sticky top-0 z-40 w-full border-b text-2xl shadow-md">
-        <div className="mx-auto flex items-center justify-between px-6 py-4">
-          <h1>Navbar</h1>
-          {/* {sessionData && roleUser && dashboardUrl && ( */}
-          {/* <Link href={dashboardUrl} className="text-black"> */}
-          <Button className="text-black" variant={"link"}>
-            Dashboard
-          </Button>
-          {/* </Link> */}
-          {/* )} */}
+    <nav className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+      <div className="container mx-auto flex items-center justify-between px-4 py-3">
+        <Link href="/" className="text-xl font-semibold text-primary">
+          Absensi Smadip
+        </Link>
+
+        <div className="flex items-center gap-4">
+          {status === "authenticated" &&
+            normalizedRole &&
+            dashboardPaths[normalizedRole] && (
+              <Link href={dashboardPaths[normalizedRole]}>
+                <Button variant="ghost" className="text-base">
+                  Dashboard
+                </Button>
+              </Link>
+            )}
+
           <Button
-            variant={"link"}
-            className="text-2xl text-black"
-            onClick={sessionData ? () => void signOut() : () => void signIn()}
+            onClick={session ? () => void signOut() : () => void signIn()}
+            variant="default"
+            className="text-base"
           >
-            {sessionData ? "Sign out" : "Sign in"}
+            {session ? "Sign out" : "Sign in"}
           </Button>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 };
