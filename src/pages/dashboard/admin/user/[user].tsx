@@ -1,10 +1,8 @@
 import { useRouter } from "next/router";
 import { type Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
 import { api } from "@/utils/api";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,25 +13,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import { ClassName } from "@prisma/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageContainer } from "@/components/layout/pageContainer";
 import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import { SectionContiner } from "@/components/layout/sectionContiner";
-
-const classNames = Object.values(ClassName) as [ClassName, ...ClassName[]];
-
-const formSchema = z.object({
-  name: z.string().optional(),
-  nisn: z.string().optional(),
-  password: z.string().optional(),
-  classNames: z.array(z.enum(classNames)).default([]),
-});
-
-type FormSchemaType = z.infer<typeof formSchema>;
+import {
+  type UpdateTeacherInputFE,
+  updateTeacherShemaFE,
+} from "@/shared/validators/teacher";
+import { classNames } from "@/shared/constants/className";
 
 export default function DetailUserTeacher() {
   const router = useRouter();
@@ -48,8 +38,10 @@ export default function DetailUserTeacher() {
     id: userId as string,
   });
 
-  const form = useForm<FormSchemaType>({
-    resolver: zodResolver(formSchema) as Resolver<FormSchemaType>,
+  const form = useForm<UpdateTeacherInputFE>({
+    resolver: zodResolver(
+      updateTeacherShemaFE,
+    ) as Resolver<UpdateTeacherInputFE>,
   });
   const { mutate, isPending } = api.admin.updateUser.useMutation({
     onSuccess: () => {
@@ -68,9 +60,7 @@ export default function DetailUserTeacher() {
     },
   });
 
-  const onSubmit = (values: FormSchemaType) => {
-    console.log("classNames saat submit:", values.classNames);
-
+  const onSubmit = (values: UpdateTeacherInputFE) => {
     if (!userId || typeof userId !== "string" || !userData) return;
 
     mutate({

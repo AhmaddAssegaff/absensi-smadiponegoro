@@ -1,31 +1,12 @@
 import { adminProcedure, createTRPCRouter } from "../trpc";
-import { z } from "zod";
-import { ClassName, Role } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-import bcrypt from "bcryptjs";
-
-const getAllTeacherInput = z.object({
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(15).default(10),
-  sortBy: z.enum(["name", "createdAt", "updatedAt"]).default("createdAt"),
-  order: z.enum(["asc", "desc"]).default("desc"),
-});
-
-const updateTeacherInput = z.object({
-  id: z.string(),
-  name: z.string().min(1).optional(),
-  nisn: z.string().min(1).optional(),
-  password: z.string().min(6).optional(),
-  classNames: z.array(z.nativeEnum(ClassName)).optional(),
-});
-
-const getUserById = z.object({
-  id: z.string(),
-});
-
-async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10);
-}
+import {
+  updateTeacherInputBE,
+  getAllTeacherInput,
+} from "@/shared/validators/teacher";
+import { getUserById } from "@/shared/validators/user";
+import { hashPassword } from "@/helper/hash";
 
 export const AdminRouter = createTRPCRouter({
   getAllTeacher: adminProcedure
@@ -76,7 +57,7 @@ export const AdminRouter = createTRPCRouter({
     }),
 
   updateUser: adminProcedure
-    .input(updateTeacherInput)
+    .input(updateTeacherInputBE)
     .mutation(async ({ ctx, input }) => {
       const { id, name, nisn, password, classNames } = input;
 
