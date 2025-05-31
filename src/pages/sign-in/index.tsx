@@ -22,9 +22,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { PageContainer } from "@/components/layout/pageContainer";
-import { useSearchParams } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function SignInPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const formSchema = z.object({
     nisn: z.string().min(2).max(50),
     password: z.string().min(5).max(20),
@@ -39,20 +42,31 @@ export default function SignInPage() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await signIn("credentials", {
-      redirect: true,
+    if (isLoading) return;
+
+    setIsLoading(true);
+    const res = await signIn("credentials", {
+      redirect: false,
       callbackUrl: "/",
       nisn: values.nisn,
       password: values.password,
     });
+
+    if (res?.ok) {
+      toast({
+        title: "Berhasil Login",
+        description: "Selamat datang kembali!",
+      });
+
+      window.location.href = res.url ?? "/";
+    } else {
+      toast({
+        title: "Gagal Sign-in",
+        description: "NISN atau password salah.",
+        variant: "destructive",
+      });
+    }
   };
-
-  const searchParams = useSearchParams();
-  const error = searchParams.get("error");
-
-  if (error === "CredentialsSignin") {
-    return console.log(error, "NISN atau password salah."); // kasih toast error
-  }
 
   return (
     <PageContainer className="z-50" center={true} variantBg={"secondary"}>
@@ -104,10 +118,9 @@ export default function SignInPage() {
               />
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">
-                Submit
+              <Button type="submit" disabled={isLoading} className="w-full">
+                {isLoading ? "Loading..." : "Submit"}
               </Button>
-              {/* kasih loading state */}
             </CardFooter>
           </form>
         </Form>

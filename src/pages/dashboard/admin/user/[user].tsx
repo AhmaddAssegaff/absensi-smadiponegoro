@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
+import { type Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
@@ -29,7 +29,7 @@ const formSchema = z.object({
   name: z.string().optional(),
   nisn: z.string().optional(),
   password: z.string().optional(),
-  classNames: z.array(z.enum(classNames)).optional(),
+  classNames: z.array(z.enum(classNames)).default([]),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -48,9 +48,8 @@ export default function DetailUserTeacher() {
   });
 
   const form = useForm<FormSchemaType>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as Resolver<FormSchemaType>,
   });
-
   const { mutate, isPending } = api.admin.updateUser.useMutation({
     onSuccess: () => {
       toast({
@@ -69,6 +68,8 @@ export default function DetailUserTeacher() {
   });
 
   const onSubmit = (values: FormSchemaType) => {
+    console.log("classNames saat submit:", values.classNames);
+
     if (!userId || typeof userId !== "string" || !userData) return;
 
     mutate({
@@ -76,9 +77,7 @@ export default function DetailUserTeacher() {
       name: values.name ?? userData.name,
       nisn: values.nisn ?? userData.nisn,
       ...(values.password ? { password: values.password } : {}),
-      classNames: values.classNames?.length
-        ? values.classNames
-        : userData.homeRoomFor?.map((ClassName) => ClassName.name),
+      classNames: values.classNames ?? [],
     });
   };
 
@@ -88,8 +87,7 @@ export default function DetailUserTeacher() {
         name: userData.name ?? "",
         nisn: userData.nisn ?? "",
         password: "",
-        classNames:
-          userData.homeRoomFor?.map((ClassName) => ClassName.name) ?? [],
+        classNames: userData.homeRoomFor?.map((c) => c.name) ?? [],
       });
     }
   }, [userData, form]);

@@ -32,21 +32,25 @@ export default function DashboardAdminPage() {
   });
 
   return (
-    <PageContainer>
-      <h1>Dashboard admin Page</h1>
-      <p>bisa CRUD guru murid</p>
-      {isLoading && <p>Loading...</p>}
+    <PageContainer variantBg={"secondary"}>
       {error && <p>Error: {error.message}</p>}
-      {data && (
-        <DataTable
-          Pagination={{
-            page: data.page,
-            total: data.total,
-            totalPages: data.totalPages,
-          }}
-          users={data.data}
-        />
-      )}
+      <DataTable
+        isLoading={isLoading}
+        Pagination={
+          data
+            ? {
+                page: data.page,
+                total: data.total,
+                totalPages: data.totalPages,
+              }
+            : {
+                page: 1,
+                total: 0,
+                totalPages: 1,
+              }
+        }
+        users={data?.data ?? []}
+      />
     </PageContainer>
   );
 }

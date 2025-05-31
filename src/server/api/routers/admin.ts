@@ -81,54 +81,69 @@ export const AdminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id, name, nisn, password, classNames } = input;
 
-      const user = await ctx.db.user.findUnique({
+      const existingUser = await ctx.db.user.findUnique({
         where: { id },
         include: { homeRoomFor: true },
       });
 
-      if (!user) {
+      if (!existingUser) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User tidak ditemukan",
         });
       }
 
-      const dataToUpdate: {
+      const updateUserData: {
         name?: string;
         nisn?: string;
         passwordHash?: string;
       } = {};
 
-      if (name) dataToUpdate.name = name;
-      if (nisn) dataToUpdate.nisn = nisn;
-      if (password) dataToUpdate.passwordHash = await hashPassword(password);
+      if (name) updateUserData.name = name;
+      if (nisn) updateUserData.nisn = nisn;
+      if (password) updateUserData.passwordHash = await hashPassword(password);
 
       return await ctx.db.$transaction(async (tx) => {
         await tx.user.update({
           where: { id },
-          data: dataToUpdate,
+          data: updateUserData,
         });
 
-        if (classNames?.length) {
-          const classes = await tx.class.findMany({
-            where: { name: { in: classNames } },
-          });
+        if (classNames) {
+          if (classNames.length > 0) {
+            const foundClasses = await tx.class.findMany({
+              where: { name: { in: classNames } },
+            });
 
-          if (classes.length !== classNames.length) {
-            throw new TRPCError({
-              code: "NOT_FOUND",
-              message: "Beberapa kelas tidak ditemukan",
+            if (foundClasses.length !== classNames.length) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Beberapa kelas tidak ditemukan",
+              });
+            }
+
+            const classesToSet = foundClasses.map((classItem) => {
+              return { id: classItem.id };
+            });
+
+            await tx.user.update({
+              where: { id },
+              data: {
+                homeRoomFor: {
+                  set: classesToSet,
+                },
+              },
+            });
+          } else {
+            await tx.user.update({
+              where: { id },
+              data: {
+                homeRoomFor: {
+                  set: [],
+                },
+              },
             });
           }
-
-          await tx.user.update({
-            where: { id },
-            data: {
-              homeRoomFor: {
-                set: classes.map((c) => ({ id: c.id })),
-              },
-            },
-          });
         }
 
         return tx.user.findUnique({

@@ -12,65 +12,29 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
 import { useQueryParams } from "@/hooks/useQueryParams";
 import { buildOrderedQuery } from "@/helper/queryPaginationHelpers";
-import { type Role } from "@prisma/client";
-import { type ClassName } from "@prisma/client";
-import { api } from "@/utils/api";
+import type { User, PaginationMeta } from "@/shared/types/user";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
-type User = {
-  id: string;
-  role: Role;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-  nisn: string;
-  passwordHash: string;
-  classId: string | null;
-
-  homeroomFor?: {
-    id: string;
-    name: string;
-    homeroomTeacherId: string | null;
-  }[];
-
-  class?: {
-    id: string;
-    name: string;
-    homeroom?: {
-      id: string;
-      name: ClassName;
-    }[];
-  } | null;
-};
-
-type PaginationMeta = {
-  page: number;
-  total: number;
-  totalPages: number;
-};
 const columns = [
   { key: "name", label: "Nama", sortable: true },
-  { key: "nisn", label: "Name Admin / Kode Guru", sortable: true },
+  { key: "nisn", label: "NISN / Kode Guru", sortable: true },
   { key: "role", label: "Role", sortable: true },
-  { key: "Wali kelas", label: "Wali kelas", sortable: true },
-  { key: "createdAt", label: "Tanggal Buat", sortable: true },
-  { key: "updatedAt", label: "Terkahir di Ubah", sortable: true },
 ];
 
 export const DataTable = ({
   users,
   Pagination,
+  isLoading,
 }: {
   users: User[];
   Pagination: PaginationMeta;
+  isLoading: boolean;
 }) => {
   const router = useRouter();
-
   const { currentPage, currentSortBy, currentOrder, rawParams } =
     useQueryParams();
-
   const { page, total, totalPages } = Pagination;
-
   const query = buildOrderedQuery(rawParams);
 
   const handlePageChange = (newPage: number) => {
@@ -118,66 +82,102 @@ export const DataTable = ({
   }, [router, router.isReady, router.query]);
 
   return (
-    <div className="rounded-md border bg-slate-800 p-4 text-white">
-      <Table>
-        <TableCaption>Daftar user.</TableCaption>
+    <div className="sectionContainerBG rounded-lg border p-6 font-semibold text-black shadow-lg">
+      <Table className="min-w-full">
+        <TableCaption className="py-2 text-center text-black">
+          Daftar user.
+        </TableCaption>
         <TableHeader>
           <TableRow>
             {columns.map((col) => (
               <TableHead
                 key={col.key}
                 onClick={col.sortable ? () => handleSort(col.key) : undefined}
-                className={col.sortable ? "cursor-pointer" : ""}
+                className="select-none px-4 py-3 text-left font-semibold text-black"
               >
-                {col.label}
-                {currentSortBy === col.key &&
-                  (currentOrder === "asc" ? " ↑" : " ↓")}
+                <div className="flex items-center gap-1">
+                  {col.label}
+                  {currentSortBy === col.key && (
+                    <span
+                      aria-label={
+                        currentOrder === "asc" ? "Ascending" : "Descending"
+                      }
+                    >
+                      {currentOrder === "asc" ? "▲" : "▼"}
+                    </span>
+                  )}
+                </div>
               </TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>
-                <Link href={`/dashboard/admin/user/${user.id}`}>
-                  {user.name ?? "-"}
-                </Link>
-              </TableCell>
-              <TableCell>{user.nisn}</TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell>{user.homeroomFor?.[0]?.name ?? "-"}</TableCell>
-              <TableCell>
-                {new Date(user.createdAt).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                {new Date(user.updatedAt).toLocaleDateString()}
+          {isLoading ? (
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            [...Array(10)].map((_, i) => (
+              <TableRow key={i}>
+                {columns.map((col) => (
+                  <TableCell key={col.key} className="px-4 py-3">
+                    <Skeleton className="bg h-4 w-full" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : users.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length}
+                className="py-6 text-center italic"
+              >
+                Tidak ada data untuk ditampilkan
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            users.map((user) => (
+              <TableRow
+                key={user.id}
+                className="transition-colors duration-150"
+              >
+                <TableCell className="whitespace-nowrap px-4 py-3">
+                  <Link
+                    href={`/dashboard/admin/user/${user.id}`}
+                    className="hover:underline"
+                  >
+                    {user.name ?? "-"}
+                  </Link>
+                </TableCell>
+                <TableCell className="px-4 py-3">{user.nisn ?? "-"}</TableCell>
+                <TableCell className="px-4 py-3 capitalize">
+                  {user.role ?? "-"}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-2">
           <Button
-            variant={currentPage > 1 ? "default" : "ghost"}
+            variant={currentPage > 1 ? "secondary" : "outline"}
             disabled={currentPage <= 1}
             onClick={() => handlePageChange(currentPage - 1)}
+            aria-label="Halaman sebelumnya"
           >
-            Prev Page
+            ← Previous
           </Button>
 
           <Button
-            variant={currentPage < totalPages ? "default" : "ghost"}
+            variant={currentPage < totalPages ? "secondary" : "outline"}
             disabled={currentPage >= totalPages}
             onClick={() => handlePageChange(currentPage + 1)}
+            aria-label="Halaman berikutnya"
           >
-            Next Page
+            Next →
           </Button>
         </div>
 
-        <div className="flex select-none gap-6 text-sm">
+        <div className="flex select-none flex-wrap gap-6 text-sm">
           <p>
             Halaman: <span className="font-semibold">{page}</span>
           </p>
