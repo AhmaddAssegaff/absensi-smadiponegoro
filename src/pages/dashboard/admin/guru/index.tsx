@@ -1,14 +1,14 @@
 import { PageContainer } from "@/components/layout/pageContainer";
 import { SectionContiner } from "@/components/layout/sectionContiner";
 
-export default function DashboardGuruPage() {
+export default function ListTeacherPage() {
   return (
     <PageContainer center={true} variantBg={"secondary"}>
       <SectionContiner>
-        <h1>Dashboard Murid Page</h1>
-        <p>
-          muird bisa lihat datar absensinya dan keterangannya dirinya sendiri
-        </p>
+        <div>
+          List dari kelas kelas kalau di click kelasnya bisa buka isi list muird
+          dan bisa naikken kelas murid / tinggal
+        </div>
       </SectionContiner>
     </PageContainer>
   );
