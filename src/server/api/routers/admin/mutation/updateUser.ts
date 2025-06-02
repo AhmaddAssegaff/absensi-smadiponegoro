@@ -1,12 +1,12 @@
-import { hashPassword } from "@/helper/hash";
-import { updateTeacherInputBE } from "@/shared/validators/teacher";
 import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "@/server/api/trpc";
+import { updateTeacherInputBE } from "@/shared/validators/teacher";
+import { hashPassword } from "@/helper/hash";
 
 export const UpdateUserTeacher = adminProcedure
   .input(updateTeacherInputBE)
   .mutation(async ({ ctx, input }) => {
-    const { id, name, nisn, password, classNames } = input;
+    const { id: teacherId, name, nisn, password, classNames } = input;
 
     const updateUserData: {
       name?: string;
@@ -19,8 +19,22 @@ export const UpdateUserTeacher = adminProcedure
     if (password) updateUserData.passwordHash = await hashPassword(password);
 
     return await ctx.db.$transaction(async (tx) => {
+      const teacher = await tx.user.findUnique({ where: { id: teacherId } });
+      if (!teacher) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Guru tidak ditemukan",
+        });
+      }
+      if (teacher.role !== "TEACHER") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User bukan guru",
+        });
+      }
+
       await tx.user.update({
-        where: { id },
+        where: { id: teacherId },
         data: updateUserData,
       });
 
@@ -36,18 +50,27 @@ export const UpdateUserTeacher = adminProcedure
           });
         }
 
-        await tx.user.update({
-          where: { id },
-          data: {
-            homeRoomFor: {
-              set: foundClasses.map((c) => ({ id: c.id })),
-            },
-          },
+        await tx.class.updateMany({
+          where: { homeroomId: teacherId },
+          data: { homeroomId: null },
         });
+
+        for (const kelas of foundClasses) {
+          if (kelas.homeroomId && kelas.homeroomId !== teacherId) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: `Kelas ${kelas.name} sudah punya wali kelas lain`,
+            });
+          }
+          await tx.class.update({
+            where: { id: kelas.id },
+            data: { homeroomId: teacherId },
+          });
+        }
       }
 
       return await tx.user.findUnique({
-        where: { id },
+        where: { id: teacherId },
         include: { homeRoomFor: true },
       });
     });
