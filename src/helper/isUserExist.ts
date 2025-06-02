@@ -8,7 +8,7 @@ type Options = {
   include?: Parameters<PrismaClient["user"]["findUnique"]>[0]["include"];
 };
 
-export async function findUserOrThrow({ prisma, id, nisn, include }: Options) {
+export async function isNisnExist({ prisma, id, nisn, include }: Options) {
   const where = id ? { id } : { nisn };
 
   const user = await prisma.user.findUnique({ where, include });

@@ -25,7 +25,7 @@ export default function ListTeacherAdminPage() {
     ? (orderParam as Order)
     : "desc";
 
-  const { data, isLoading, error } = api.admin.getAllTeacher.useQuery({
+  const { data, isLoading, error } = api.admin.GetAllTeacher.useQuery({
     limit: 10,
     page: pageParam,
     sortBy,

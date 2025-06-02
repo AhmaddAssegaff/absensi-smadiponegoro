@@ -69,7 +69,7 @@ export default function CreateAccountPage() {
     },
   });
 
-  const { mutate, isPending } = api.admin.createUser.useMutation({
+  const { mutate, isPending } = api.admin.CreateUser.useMutation({
     onSuccess: () => {
       toast({
         title: "Berhasil",
@@ -86,7 +86,6 @@ export default function CreateAccountPage() {
   });
 
   const onSubmit = (values: CreateUserInferFE) => {
-    console.log(values);
     const payload = {
       name: values.name,
       nisn: values.nisn,

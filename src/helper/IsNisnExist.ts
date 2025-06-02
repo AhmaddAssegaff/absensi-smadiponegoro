@@ -1,9 +1,7 @@
-// src/helper/throwIfUserExists.ts
-
 import { type PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-export async function throwIfUserExists({
+export async function isNisnExist({
   prisma,
   nisn,
 }: {

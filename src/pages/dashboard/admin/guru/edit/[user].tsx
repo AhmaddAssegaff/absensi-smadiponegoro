@@ -34,7 +34,7 @@ export default function DetailUserTeacher() {
     isLoading,
     isError,
     refetch,
-  } = api.admin.getUserById.useQuery({
+  } = api.admin.GetUserById.useQuery({
     id: userId as string,
   });
 
@@ -43,7 +43,7 @@ export default function DetailUserTeacher() {
       updateTeacherShemaFE,
     ) as Resolver<UpdateTeacherInputFE>,
   });
-  const { mutate, isPending } = api.admin.updateUser.useMutation({
+  const { mutate, isPending } = api.admin.UpdateUser.useMutation({
     onSuccess: () => {
       toast({
         title: "Berhasil",
