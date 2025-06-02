@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
-import { useReadPaginationSort } from "@/hooks/useReadQueryParams";
+import { useQueryParams } from "@/hooks/useQueryParams";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { User, PaginationMeta } from "@/shared/types/trpc";
@@ -33,7 +33,7 @@ export const DataTable = ({
 }) => {
   const router = useRouter();
   const { setQueryParams } = useSetQueryParams();
-  const { currentPage, currentSortBy, currentOrder } = useReadPaginationSort();
+  const { currentPage, currentSortBy, currentOrder } = useQueryParams();
 
   const { page, total, totalPages } = Pagination;
 
