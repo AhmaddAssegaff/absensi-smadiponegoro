@@ -34,12 +34,13 @@ model User {
 }
 
 model Class {
-  id       String   @id @default(uuid())
-  name     ClassName @unique
+  id        String    @id @default(uuid())
+  name      ClassName @unique
 
-  students User[]   @relation("SiswaKelas")
+  students  User[]    @relation("SiswaKelas")
 
-  homerooms User[]  @relation("WaliKelas")
+  homeroomId String
+  homeroom   User      @relation("WaliKelas", fields: [homeroomId], references: [id])
 }
 
 model Attendance {
