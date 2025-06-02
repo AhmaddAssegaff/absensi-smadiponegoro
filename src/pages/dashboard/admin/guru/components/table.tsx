@@ -140,7 +140,7 @@ export const DataTable = ({
               >
                 <TableCell className="whitespace-nowrap px-4 py-3">
                   <Link
-                    href={`/dashboard/admin/user/${user.id}`}
+                    href={`/dashboard/admin/guru/edit/${user.id}`}
                     className="hover:underline"
                   >
                     {user.name ?? "-"}

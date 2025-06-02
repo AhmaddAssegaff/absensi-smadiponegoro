@@ -1,12 +1,16 @@
 import { adminProcedure, createTRPCRouter } from "../trpc";
-import { Role } from "@prisma/client";
+import { type Prisma, Role } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+
 import {
   updateTeacherInputBE,
   getAllTeacherInput,
 } from "@/shared/validators/teacher";
-import { getUserById } from "@/shared/validators/user";
+import { createUserFE, getUserById } from "@/shared/validators/user";
+
 import { hashPassword } from "@/helper/hash";
+import { findUserOrThrow } from "@/helper/findUserOrThrow";
+import { throwIfUserExists } from "@/helper/throwIfUserExists";
 
 export const AdminRouter = createTRPCRouter({
   getAllTeacher: adminProcedure
@@ -41,37 +45,17 @@ export const AdminRouter = createTRPCRouter({
   getUserById: adminProcedure
     .input(getUserById)
     .query(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({
-        where: { id: input.id },
+      return await findUserOrThrow({
+        prisma: ctx.db,
+        id: input.id,
         include: { homeRoomFor: true },
       });
-
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User tidak ditemukan",
-        });
-      }
-
-      return user;
     }),
 
   updateUser: adminProcedure
     .input(updateTeacherInputBE)
     .mutation(async ({ ctx, input }) => {
       const { id, name, nisn, password, classNames } = input;
-
-      const existingUser = await ctx.db.user.findUnique({
-        where: { id },
-        include: { homeRoomFor: true },
-      });
-
-      if (!existingUser) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User tidak ditemukan",
-        });
-      }
 
       const updateUserData: {
         name?: string;
@@ -89,47 +73,72 @@ export const AdminRouter = createTRPCRouter({
           data: updateUserData,
         });
 
-        if (classNames) {
-          if (classNames.length > 0) {
-            const foundClasses = await tx.class.findMany({
-              where: { name: { in: classNames } },
-            });
+        if (classNames !== undefined) {
+          const foundClasses = await tx.class.findMany({
+            where: { name: { in: classNames } },
+          });
 
-            if (foundClasses.length !== classNames.length) {
-              throw new TRPCError({
-                code: "NOT_FOUND",
-                message: "Beberapa kelas tidak ditemukan",
-              });
-            }
-
-            const classesToSet = foundClasses.map((classItem) => {
-              return { id: classItem.id };
-            });
-
-            await tx.user.update({
-              where: { id },
-              data: {
-                homeRoomFor: {
-                  set: classesToSet,
-                },
-              },
-            });
-          } else {
-            await tx.user.update({
-              where: { id },
-              data: {
-                homeRoomFor: {
-                  set: [],
-                },
-              },
+          if (foundClasses.length !== classNames.length) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "Beberapa kelas tidak ditemukan",
             });
           }
+
+          await tx.user.update({
+            where: { id },
+            data: {
+              homeRoomFor: {
+                set: foundClasses.map((c) => ({ id: c.id })),
+              },
+            },
+          });
         }
 
-        return tx.user.findUnique({
+        return await tx.user.findUnique({
           where: { id },
           include: { homeRoomFor: true },
         });
+      });
+    }),
+
+  createUser: adminProcedure
+    .input(createUserFE)
+    .mutation(async ({ ctx, input }) => {
+      const { name, nisn, passwordHash, role, className, homeRoomFor } = input;
+
+      await throwIfUserExists({
+        prisma: ctx.db,
+        nisn,
+      });
+
+      const hashedPassword = await hashPassword(passwordHash);
+
+      const userData: Prisma.UserCreateInput = {
+        name,
+        nisn,
+        passwordHash: hashedPassword,
+        role,
+      };
+
+      if (role === "STUDENT" && className) {
+        userData.classesAsStudent = {
+          connect: { name: className },
+        };
+      }
+
+      if (
+        role === "TEACHER" &&
+        Array.isArray(homeRoomFor) &&
+        homeRoomFor.length > 0
+      ) {
+        userData.homeRoomFor = {
+          connect: homeRoomFor.map((id) => ({ id })),
+        };
+      }
+
+      return await ctx.db.user.create({
+        data: userData,
       });
     }),
 });

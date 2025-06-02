@@ -29,6 +29,8 @@ import { Button } from "@/components/ui/button";
 import { type CreateUserInferFE, createUserFE } from "@/shared/validators/user";
 import { roles } from "@/shared/constants/role";
 import { classNames } from "@/shared/constants/className";
+import { api } from "@/utils/api";
+import { toast } from "@/hooks/use-toast";
 
 const inputFields = [
   {
@@ -67,8 +69,40 @@ export default function CreateAccountPage() {
     },
   });
 
+  const { mutate, isPending } = api.admin.createUser.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Berhasil",
+        description: "membuat Akun",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal",
+        description: error.message ?? "Gagal membuat akun",
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = (values: CreateUserInferFE) => {
     console.log(values);
+    const payload = {
+      name: values.name,
+      nisn: values.nisn,
+      passwordHash: values.passwordHash,
+      role: values.role,
+      ...(values.role === "STUDENT" && values.className
+        ? { className: values.className }
+        : {}),
+      ...(values.role === "TEACHER" &&
+      values.homeRoomFor &&
+      values.homeRoomFor.length > 0
+        ? { homeRoomFor: values.homeRoomFor }
+        : {}),
+    };
+
+    mutate(payload);
     form.reset();
   };
 
@@ -82,11 +116,11 @@ export default function CreateAccountPage() {
             <CardHeader>
               <CardTitle>Buat Akun</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-6"
+                  className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-8"
                 >
                   {inputFields.map(
                     ({ name, label, placeholder, type = "text" }) => (
@@ -168,7 +202,6 @@ export default function CreateAccountPage() {
                       )}
                     />
                   )}
-
                   <CardFooter>
                     <Button type="submit" className="w-full">
                       Buat Akun
