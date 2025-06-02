@@ -39,8 +39,8 @@ model Class {
 
   students  User[]    @relation("SiswaKelas")
 
-  homeroomId String
-  homeroom   User      @relation("WaliKelas", fields: [homeroomId], references: [id])
+  homeroomId String?
+  homeroom   User?      @relation("WaliKelas", fields: [homeroomId], references: [id])
 }
 
 model Attendance {
