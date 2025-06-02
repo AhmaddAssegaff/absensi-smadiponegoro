@@ -3,7 +3,7 @@ import { updateTeacherInputBE } from "@/shared/validators/teacher";
 import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "@/server/api/trpc";
 
-export const UpdateUser = adminProcedure
+export const UpdateUserTeacher = adminProcedure
   .input(updateTeacherInputBE)
   .mutation(async ({ ctx, input }) => {
     const { id, name, nisn, password, classNames } = input;

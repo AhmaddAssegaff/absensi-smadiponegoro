@@ -43,7 +43,7 @@ export default function DetailUserTeacher() {
       updateTeacherShemaFE,
     ) as Resolver<UpdateTeacherInputFE>,
   });
-  const { mutate, isPending } = api.admin.UpdateUser.useMutation({
+  const { mutate, isPending } = api.admin.UpdateUserTeacher.useMutation({
     onSuccess: () => {
       toast({
         title: "Berhasil",

@@ -82,7 +82,7 @@ export const DataTable = ({
   }, [router, router.isReady, router.query]);
 
   return (
-    <div className="sectionContainerBG rounded-lg border p-6 font-semibold text-black shadow-lg">
+    <div className="rounded-lg border bg-white p-6 font-semibold text-black shadow-lg">
       <Table className="min-w-full">
         <TableCaption className="py-2 text-center text-black">
           Click Nama untuk melihat lebih detail
