@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
-import { usePaginationSort } from "@/hooks/useQueryParams";
+import { useReadPaginationSort } from "@/hooks/useReadQueryParams";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { User, PaginationMeta } from "@/shared/types/trpc";
+import { useSetQueryParams } from "@/hooks/useSetQueryParams";
 
 const columns = [
   { key: "name", label: "Nama", sortable: true },
@@ -31,23 +32,19 @@ export const DataTable = ({
   isLoading: boolean;
 }) => {
   const router = useRouter();
-  const { currentPage, currentSortBy, currentOrder, orderedQuery } =
-    usePaginationSort();
+  const { setQueryParams } = useSetQueryParams();
+  const { currentPage, currentSortBy, currentOrder } = useReadPaginationSort();
 
   const { page, total, totalPages } = Pagination;
 
   const handlePageChange = (newPage: number) => {
-    void router.replace(
-      `?${new URLSearchParams({ ...orderedQuery, page: String(newPage) }).toString()}`,
-    );
+    setQueryParams({ page: String(newPage) });
   };
 
   const handleSort = (sortBy: string) => {
     const newOrder =
       currentSortBy === sortBy && currentOrder === "asc" ? "desc" : "asc";
-    void router.replace(
-      `?${new URLSearchParams({ ...orderedQuery, sortBy, order: newOrder }).toString()}`,
-    );
+    setQueryParams({ sortBy, order: newOrder });
   };
 
   useEffect(() => {

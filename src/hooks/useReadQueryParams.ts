@@ -2,16 +2,16 @@ import { useSearchParams } from "next/navigation";
 
 const DEFAULT_LIMIT = 10;
 const DEFAULT_PAGE = 1;
-const DEFAULT_SORT_BY = "createdAt";
+const DEFAULT_SORT_BY = "updatedAt";
 const DEFAULT_ORDER: "asc" | "desc" = "desc";
 
-const VALID_SORT_BY = ["name", "createdAt", "updatedAt"] as const;
+const VALID_SORT_BY = ["name", "nisn", "role", "updatedAt"] as const;
 const VALID_ORDER = ["asc", "desc"] as const;
 
 type SortBy = (typeof VALID_SORT_BY)[number];
 type Order = (typeof VALID_ORDER)[number];
 
-export const usePaginationSort = () => {
+export const useReadPaginationSort = () => {
   const queryParams = useSearchParams();
 
   const rawParams = Object.fromEntries(queryParams.entries());

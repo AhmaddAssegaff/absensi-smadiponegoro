@@ -2,10 +2,10 @@ import { PageContainer } from "@/components/layout/pageContainer";
 import { api } from "@/utils/api";
 import { DataTable } from "./components/table";
 import { SectionContiner } from "@/components/layout/sectionContiner";
-import { usePaginationSort } from "@/hooks/useQueryParams";
+import { useReadPaginationSort } from "@/hooks/useReadQueryParams";
 
 export default function ListTeacherAdminPage() {
-  const { currentPage, currentSortBy, currentOrder } = usePaginationSort();
+  const { currentPage, currentSortBy, currentOrder } = useReadPaginationSort();
 
   const { data, isLoading, error } = api.admin.GetAllTeacher.useQuery({
     limit: 10,
