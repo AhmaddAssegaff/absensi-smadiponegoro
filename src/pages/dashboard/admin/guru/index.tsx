@@ -1,35 +1,17 @@
 import { PageContainer } from "@/components/layout/pageContainer";
 import { api } from "@/utils/api";
 import { DataTable } from "./components/table";
-import { useSearchParams } from "next/navigation";
 import { SectionContiner } from "@/components/layout/sectionContiner";
+import { usePaginationSort } from "@/hooks/useQueryParams";
 
 export default function ListTeacherAdminPage() {
-  const queryParams = useSearchParams();
-
-  const pageParam = Math.max(1, Number(queryParams.get("page") ?? "1"));
-  const sortByParam = queryParams.get("sortBy");
-  const orderParam = queryParams.get("order");
-
-  const validSortBy = ["name", "createdAt", "updatedAt"] as const;
-  const validOrder = ["asc", "desc"] as const;
-
-  type SortBy = (typeof validSortBy)[number];
-  type Order = (typeof validOrder)[number];
-
-  const sortBy: SortBy = validSortBy.includes(sortByParam as SortBy)
-    ? (sortByParam as SortBy)
-    : "createdAt";
-
-  const order: Order = validOrder.includes(orderParam as Order)
-    ? (orderParam as Order)
-    : "desc";
+  const { currentPage, currentSortBy, currentOrder } = usePaginationSort();
 
   const { data, isLoading, error } = api.admin.GetAllTeacher.useQuery({
     limit: 10,
-    page: pageParam,
-    sortBy,
-    order,
+    page: currentPage,
+    sortBy: currentSortBy,
+    order: currentOrder,
   });
 
   return (
@@ -45,21 +27,13 @@ export default function ListTeacherAdminPage() {
         </div>
         {error && <p>Error: {error.message}</p>}
         <DataTable
-          isLoading={isLoading}
-          Pagination={
-            data
-              ? {
-                  page: data.page,
-                  total: data.total,
-                  totalPages: data.totalPages,
-                }
-              : {
-                  page: 1,
-                  total: 0,
-                  totalPages: 1,
-                }
-          }
           users={data?.data ?? []}
+          Pagination={{
+            page: data?.page ?? 1,
+            total: data?.total ?? 0,
+            totalPages: data?.totalPages ?? 1,
+          }}
+          isLoading={isLoading}
         />
       </SectionContiner>
     </PageContainer>
