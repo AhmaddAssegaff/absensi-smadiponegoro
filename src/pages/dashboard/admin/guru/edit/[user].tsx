@@ -43,13 +43,14 @@ export default function DetailUserTeacher() {
   const form = useForm<UpdateUserInput>({
     resolver: zodResolver(updateUserShema) as Resolver<UpdateUserInput>,
   });
+
   const { mutate, isPending } = api.admin.UpdateUserTeacher.useMutation({
     onSuccess: () => {
       toast({
         title: "Berhasil",
         description: "Data wali kelas berhasil diubah.",
       });
-      void utils.admin.GetAllTeacher.invalidate();
+      void utils.admin.GetAllTeacher.refetch();
       void refetch();
     },
     onError: (error) => {
