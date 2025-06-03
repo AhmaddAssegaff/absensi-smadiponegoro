@@ -1,4 +1,4 @@
-import { getUserById } from "@/shared/validators/user";
+import { getUserById } from "@/shared/validators/getUserById";
 import { adminProcedure } from "@/server/api/trpc";
 
 export const GetUserById = adminProcedure

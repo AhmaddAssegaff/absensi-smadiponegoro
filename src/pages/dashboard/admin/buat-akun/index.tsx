@@ -3,6 +3,7 @@ import { SectionContiner } from "@/components/layout/sectionContiner";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,7 +27,10 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { type CreateUserInferFE, createUserFE } from "@/shared/validators/user";
+import {
+  type CreateUserInput,
+  createUserSchema,
+} from "@/shared/validators/createUserSchema";
 import { roles } from "@/shared/constants/role";
 import { classNames } from "@/shared/constants/className";
 import { api } from "@/utils/api";
@@ -50,21 +54,21 @@ const inputFields = [
     type: "password",
   },
 ] satisfies {
-  name: keyof CreateUserInferFE;
+  name: keyof CreateUserInput;
   label: string;
   placeholder: string;
   type?: string;
 }[];
 
 export default function CreateAccountPage() {
-  const form = useForm<CreateUserInferFE>({
-    resolver: zodResolver(createUserFE),
+  const form = useForm<CreateUserInput>({
+    resolver: zodResolver(createUserSchema),
     defaultValues: {
       nisn: "",
       name: "",
       passwordHash: "",
       role: roles[0],
-      className: undefined,
+      classesAsStudent: classNames[0],
       homeRoomFor: [],
     },
   });
@@ -77,6 +81,7 @@ export default function CreateAccountPage() {
       });
     },
     onError: (error) => {
+      console.log(error);
       toast({
         title: "Gagal",
         description: error.message ?? "Gagal membuat akun",
@@ -85,15 +90,14 @@ export default function CreateAccountPage() {
     },
   });
 
-  const onSubmit = (values: CreateUserInferFE) => {
+  const onSubmit = (values: CreateUserInput) => {
     const payload = {
       name: values.name,
       nisn: values.nisn,
       passwordHash: values.passwordHash,
       role: values.role,
-      ...(values.role === "STUDENT" && values.className
-        ? { className: values.className }
-        : {}),
+      classesAsStudent:
+        values.role === "STUDENT" ? values.classesAsStudent : classNames[0],
       ...(values.role === "TEACHER" &&
       values.homeRoomFor &&
       values.homeRoomFor.length > 0
@@ -101,8 +105,8 @@ export default function CreateAccountPage() {
         : {}),
     };
 
-    mutate(payload);
     form.reset();
+    mutate(payload);
   };
 
   const selectedRole = form.watch("role");
@@ -110,17 +114,17 @@ export default function CreateAccountPage() {
   return (
     <PageContainer center variantBg="secondary">
       <SectionContiner>
-        <div>
-          <Card className="w-full p-4">
-            <CardHeader>
-              <CardTitle>Buat Akun</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-8"
-                >
+        <Card className="mx-auto w-full max-w-4xl p-4">
+          <CardHeader>
+            <CardTitle className="text-xl md:text-2xl">Buat Akun</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   {inputFields.map(
                     ({ name, label, placeholder, type = "text" }) => (
                       <FormField
@@ -175,9 +179,9 @@ export default function CreateAccountPage() {
                   {selectedRole === "STUDENT" && (
                     <FormField
                       control={form.control}
-                      name="className"
+                      name="classesAsStudent"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="md:col-span-2">
                           <FormLabel>Kelas</FormLabel>
                           <Select
                             onValueChange={field.onChange}
@@ -201,16 +205,58 @@ export default function CreateAccountPage() {
                       )}
                     />
                   )}
-                  <CardFooter>
-                    <Button type="submit" className="w-full">
-                      Buat Akun
-                    </Button>
-                  </CardFooter>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
+
+                  {selectedRole === "TEACHER" && (
+                    <FormField
+                      control={form.control}
+                      name="homeRoomFor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Kelas Wali</FormLabel>
+                          <div className="grid grid-cols-2 gap-2 text-left">
+                            {classNames.map((className) => (
+                              <label
+                                key={className}
+                                className="flex items-center gap-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={
+                                    field.value?.includes(className) ?? false
+                                  }
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      e.target.checked
+                                        ? [...(field.value ?? []), className]
+                                        : (field.value ?? []).filter(
+                                            (v) => v !== className,
+                                          ),
+                                    )
+                                  }
+                                />
+                                <span>{className}</span>
+                              </label>
+                            ))}
+                          </div>
+                          <FormDescription>
+                            Pilih satu atau beberapa kelas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+
+                <CardFooter className="pt-4">
+                  <Button type="submit" disabled={isPending} className="w-full">
+                    {isPending ? "Loading..." : "Buat Akun"}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </SectionContiner>
     </PageContainer>
   );

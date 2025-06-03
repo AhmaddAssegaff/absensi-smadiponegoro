@@ -1,13 +1,14 @@
 import { hashPassword } from "@/helper/hash";
 import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
-import { createUserFE } from "@/shared/validators/user";
+import { createUserSchema } from "@/shared/validators/createUserSchema";
 import { type Prisma } from "@prisma/client";
 import { adminProcedure } from "@/server/api/trpc";
 
 export const CreateUser = adminProcedure
-  .input(createUserFE)
+  .input(createUserSchema)
   .mutation(async ({ ctx, input }) => {
-    const { name, nisn, passwordHash, role, className, homeRoomFor } = input;
+    const { name, nisn, passwordHash, role, classesAsStudent, homeRoomFor } =
+      input;
 
     await findDuplicateNisn({
       prisma: ctx.db,
@@ -23,9 +24,18 @@ export const CreateUser = adminProcedure
       role,
     };
 
-    if (role === "STUDENT" && className) {
+    if (role === "STUDENT" && classesAsStudent) {
+      const classRecord = await ctx.db.class.findUnique({
+        where: { name: classesAsStudent },
+        select: { id: true },
+      });
+
+      if (!classRecord) {
+        throw new Error("Kelas tidak ditemukan");
+      }
+
       userData.classesAsStudent = {
-        connect: { name: className },
+        connect: { id: classRecord.id },
       };
     }
 
@@ -34,8 +44,23 @@ export const CreateUser = adminProcedure
       Array.isArray(homeRoomFor) &&
       homeRoomFor.length > 0
     ) {
+      const connectedClasses = [];
+
+      for (const className of homeRoomFor) {
+        const classRecord = await ctx.db.class.findUnique({
+          where: { name: className },
+          select: { id: true },
+        });
+
+        if (!classRecord) {
+          throw new Error(`Kelas '${className}' tidak ditemukan`);
+        }
+
+        connectedClasses.push({ id: classRecord.id });
+      }
+
       userData.homeRoomFor = {
-        connect: homeRoomFor.map((id) => ({ id })),
+        connect: connectedClasses,
       };
     }
 
