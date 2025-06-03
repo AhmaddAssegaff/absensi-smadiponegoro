@@ -53,7 +53,7 @@ export const PageContainer = ({
         ogUrl={ogUrl}
       />
       <main className={cn(pageContainer({ variantBg, center, className }))}>
-        <div className="mx-auto max-w-5xl">{children}</div>
+        {center ? <div className="w-full">{children}</div> : children}
       </main>
     </>
   );

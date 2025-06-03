@@ -6,8 +6,8 @@ type SectionContainerProps = {
 
 export const SectionContiner = ({ children }: SectionContainerProps) => {
   return (
-    <>
-      <section className="bg container mx-auto px-4">{children}</section>
-    </>
+    <section className="mx-auto w-full max-w-screen-md px-4 sm:px-6 lg:px-8">
+      {children}
+    </section>
   );
 };
