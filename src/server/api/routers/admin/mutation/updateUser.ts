@@ -35,10 +35,10 @@ export const UpdateUserTeacher = adminProcedure
           message: "Guru tidak ditemukan",
         });
       }
-      if (teacher.role !== "TEACHER") {
+      if (teacher.role === "STUDENT") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "User bukan guru",
+          message: "User bukan guru / Admin",
         });
       }
 

@@ -76,6 +76,7 @@ export default function DetailUserTeacher() {
   useEffect(() => {
     if (userData) {
       form.reset({
+        id: userData.id,
         name: userData.name ?? "",
         nisn: userData.nisn ?? "",
         password: "",
