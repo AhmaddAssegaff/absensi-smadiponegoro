@@ -1,15 +1,15 @@
 import { z } from "zod";
-import { baseUserSchema } from "@/shared/validators/baseUserShema";
-import { classNames } from "@/shared/constants/className";
+import { baseUserSchema } from "@/shared/validators/common/baseUserShema";
+import { ClassName } from "@/shared/constants/className";
 
 export const createUserSchema = baseUserSchema
   .extend({
     classesAsStudent: z
-      .enum(classNames, {
+      .nativeEnum(ClassName, {
         errorMap: () => ({ message: "Harap pilih kelas yang valid" }),
       })
       .optional(),
-    homeRoomFor: z.array(z.enum(classNames)).optional(),
+    homeRoomFor: z.array(z.nativeEnum(ClassName)).optional(),
   })
   .refine(
     (data) =>
