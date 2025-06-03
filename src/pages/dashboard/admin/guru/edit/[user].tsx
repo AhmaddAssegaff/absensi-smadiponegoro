@@ -29,6 +29,8 @@ export default function DetailUserTeacher() {
   const router = useRouter();
   const { user: userId } = router.query;
 
+  const utils = api.useUtils();
+
   const {
     data: userData,
     isLoading,
@@ -49,6 +51,7 @@ export default function DetailUserTeacher() {
         title: "Berhasil",
         description: "Data wali kelas berhasil diubah.",
       });
+      void utils.admin.GetAllTeacher.invalidate();
       void refetch();
     },
     onError: (error) => {
