@@ -210,7 +210,7 @@ export default function CreateAccountPage() {
                       control={form.control}
                       name="homeRoomFor"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="md:col-span-2">
                           <FormLabel>Kelas Wali</FormLabel>
                           <div className="grid grid-cols-2 gap-2 text-left">
                             {classNames.map((className) => (

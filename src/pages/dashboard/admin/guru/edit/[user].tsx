@@ -20,9 +20,9 @@ import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import { SectionContiner } from "@/components/layout/sectionContiner";
 import {
-  type UpdateTeacherInputFE,
-  updateTeacherShemaFE,
-} from "@/shared/validators/teacher";
+  type UpdateUserInput,
+  updateUserShema,
+} from "@/shared/validators/updateUserShema";
 import { classNames } from "@/shared/constants/className";
 
 export default function DetailUserTeacher() {
@@ -40,10 +40,8 @@ export default function DetailUserTeacher() {
     id: userId as string,
   });
 
-  const form = useForm<UpdateTeacherInputFE>({
-    resolver: zodResolver(
-      updateTeacherShemaFE,
-    ) as Resolver<UpdateTeacherInputFE>,
+  const form = useForm<UpdateUserInput>({
+    resolver: zodResolver(updateUserShema) as Resolver<UpdateUserInput>,
   });
   const { mutate, isPending } = api.admin.UpdateUserTeacher.useMutation({
     onSuccess: () => {
@@ -63,7 +61,7 @@ export default function DetailUserTeacher() {
     },
   });
 
-  const onSubmit = (values: UpdateTeacherInputFE) => {
+  const onSubmit = (values: UpdateUserInput) => {
     if (!userId || typeof userId !== "string" || !userData) return;
 
     mutate({
@@ -85,6 +83,10 @@ export default function DetailUserTeacher() {
       });
     }
   }, [userData, form]);
+
+  const userRole = userData?.role;
+
+  const IsTeacher = userRole === "TEACHER";
 
   return (
     <PageContainer variantBg="secondary">
@@ -207,45 +209,46 @@ export default function DetailUserTeacher() {
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="classNames"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kelas Wali</FormLabel>
-                        <div className="grid grid-cols-2 gap-2 text-left">
-                          {classNames.map((className) => (
-                            <label
-                              key={className}
-                              className="flex items-center gap-2"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={
-                                  field.value?.includes(className) ?? false
-                                }
-                                onChange={(e) =>
-                                  field.onChange(
-                                    e.target.checked
-                                      ? [...(field.value ?? []), className]
-                                      : (field.value ?? []).filter(
-                                          (v) => v !== className,
-                                        ),
-                                  )
-                                }
-                              />
-                              <span>{className}</span>
-                            </label>
-                          ))}
-                        </div>
-                        <FormDescription>
-                          Pilih satu atau beberapa kelas.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {IsTeacher && (
+                    <FormField
+                      control={form.control}
+                      name="classNames"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Kelas Wali</FormLabel>
+                          <div className="grid grid-cols-2 gap-2 text-left">
+                            {classNames.map((className) => (
+                              <label
+                                key={className}
+                                className="flex items-center gap-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={
+                                    field.value?.includes(className) ?? false
+                                  }
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      e.target.checked
+                                        ? [...(field.value ?? []), className]
+                                        : (field.value ?? []).filter(
+                                            (v) => v !== className,
+                                          ),
+                                    )
+                                  }
+                                />
+                                <span>{className}</span>
+                              </label>
+                            ))}
+                          </div>
+                          <FormDescription>
+                            Pilih satu atau beberapa kelas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <Button type="submit" disabled={isPending} className="w-full">
                     {isPending ? "Menyimpan..." : "Simpan"}

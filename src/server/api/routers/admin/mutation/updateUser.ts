@@ -1,11 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "@/server/api/trpc";
-import { updateTeacherInputBE } from "@/shared/validators/teacher";
+import { updateUserShema } from "@/shared/validators/updateUserShema";
 import { hashPassword } from "@/helper/hash";
 import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
 
 export const UpdateUserTeacher = adminProcedure
-  .input(updateTeacherInputBE)
+  .input(updateUserShema)
   .mutation(async ({ ctx, input }) => {
     const { id: teacherId, name, nisn, password, classNames } = input;
 
