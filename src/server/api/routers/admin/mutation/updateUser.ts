@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "@/server/api/trpc";
 import { updateTeacherInputBE } from "@/shared/validators/teacher";
 import { hashPassword } from "@/helper/hash";
+import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
 
 export const UpdateUserTeacher = adminProcedure
   .input(updateTeacherInputBE)
@@ -13,6 +14,14 @@ export const UpdateUserTeacher = adminProcedure
       nisn?: string;
       passwordHash?: string;
     } = {};
+
+    if (nisn) {
+      await findDuplicateNisn({
+        nisn,
+        prisma: ctx.db,
+        excludeUserId: teacherId,
+      });
+    }
 
     if (name) updateUserData.name = name;
     if (nisn) updateUserData.nisn = nisn;

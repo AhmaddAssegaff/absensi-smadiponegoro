@@ -1,5 +1,5 @@
 import { hashPassword } from "@/helper/hash";
-import { isNisnExist } from "@/helper/IsNisnExist";
+import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
 import { createUserFE } from "@/shared/validators/user";
 import { type Prisma } from "@prisma/client";
 import { adminProcedure } from "@/server/api/trpc";
@@ -9,7 +9,7 @@ export const CreateUser = adminProcedure
   .mutation(async ({ ctx, input }) => {
     const { name, nisn, passwordHash, role, className, homeRoomFor } = input;
 
-    await isNisnExist({
+    await findDuplicateNisn({
       prisma: ctx.db,
       nisn,
     });
