@@ -1,7 +1,7 @@
 import { hashPassword } from "@/helper/hash";
 import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
 import { createUserSchema } from "@/shared/validators/createUserSchema";
-import { type Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { adminProcedure } from "@/server/api/trpc";
 
 export const CreateUser = adminProcedure
@@ -54,6 +54,27 @@ export const CreateUser = adminProcedure
 
         if (!classRecord) {
           throw new Error(`Kelas '${className}' tidak ditemukan`);
+        }
+
+        const existingTeacher = await ctx.db.user.findFirst({
+          where: {
+            role: "TEACHER",
+            homeRoomFor: {
+              some: {
+                id: classRecord.id,
+              },
+            },
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
+
+        if (existingTeacher) {
+          throw new Error(
+            `Kelas '${className}' sudah menjadi kelas wali dari guru '${existingTeacher.name}'`,
+          );
         }
 
         connectedClasses.push({ id: classRecord.id });

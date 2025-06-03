@@ -68,7 +68,7 @@ export default function CreateAccountPage() {
       name: "",
       passwordHash: "",
       role: roles[0],
-      classesAsStudent: classNames[0],
+      classesAsStudent: undefined,
       homeRoomFor: [],
     },
   });
@@ -97,12 +97,11 @@ export default function CreateAccountPage() {
       passwordHash: values.passwordHash,
       role: values.role,
       classesAsStudent:
-        values.role === "STUDENT" ? values.classesAsStudent : classNames[0],
-      ...(values.role === "TEACHER" &&
-      values.homeRoomFor &&
-      values.homeRoomFor.length > 0
-        ? { homeRoomFor: values.homeRoomFor }
-        : {}),
+        values.role === "STUDENT" ? values.classesAsStudent : undefined,
+      homeRoomFor:
+        values.role === "TEACHER" && values.homeRoomFor?.length
+          ? values.homeRoomFor
+          : undefined,
     };
 
     form.reset();
@@ -185,7 +184,7 @@ export default function CreateAccountPage() {
                           <FormLabel>Kelas</FormLabel>
                           <Select
                             onValueChange={field.onChange}
-                            value={field.value ?? ""}
+                            value={field.value ?? undefined}
                           >
                             <FormControl>
                               <SelectTrigger>
