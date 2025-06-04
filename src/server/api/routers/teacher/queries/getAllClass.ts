@@ -2,7 +2,7 @@ import { teacherProcedure } from "@/server/api/trpc";
 
 export const GetAllClass = teacherProcedure.query(({ ctx }) => {
   return ctx.db.class.findMany({
-    orderBy: { className: "asc" },
+    orderBy: { ClassName: "asc" },
     include: {
       homeroom: {
         select: {

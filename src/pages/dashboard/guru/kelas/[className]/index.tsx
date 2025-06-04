@@ -1,22 +1,18 @@
 import { PageContainer } from "@/components/layout/pageContainer";
 import { SectionContiner } from "@/components/layout/sectionContiner";
-import { useQueryParams } from "@/hooks/useQueryParams";
 import { api } from "@/utils/api";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 export default function DetailClassPage() {
-  const { rawParams } = useQueryParams();
   const router = useRouter();
   const { className } = router.query;
 
   const { data, isLoading, error } = api.teacher.GetClassByClassName.useQuery({
-    className: "XII_IPA",
-    gender: "FEMALE",
+    className: "X_IPA_PUTRA",
   });
 
   // console.log("className dari URL:", className);
-  // console.log("query string:", rawParams);
   console.log("data", data);
 
   // useEffect(() => {

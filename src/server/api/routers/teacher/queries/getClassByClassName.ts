@@ -4,10 +4,10 @@ import { getClassByClassName } from "@/shared/validators/teacher/getClassByClass
 export const GetClassByClassName = teacherProcedure
   .input(getClassByClassName)
   .query(({ ctx, input }) => {
-    const { className, gender } = input;
+    const { className } = input;
 
     return ctx.db.class.findFirst({
-      where: { className: className, gender: gender },
+      where: { ClassName: className },
       include: {
         homeroom: {
           select: {

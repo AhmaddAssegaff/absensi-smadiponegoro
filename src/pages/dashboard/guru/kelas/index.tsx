@@ -34,12 +34,12 @@ export default function ListClassPage() {
             classes?.map((kelas) => (
               <Link
                 key={kelas.id}
-                href={`/dashboard/guru/kelas/${formatClassNameToUrl(kelas.className)}`}
+                href={`/dashboard/guru/kelas/${formatClassNameToUrl(kelas.ClassName as string)}`}
                 className="rounded-xl transition hover:shadow-md"
               >
                 <Card className="p-4">
                   <div className="text-base font-semibold">
-                    {kelas.className}
+                    {kelas.ClassName}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     Wali Kelas: {kelas.homeroom?.name ?? "-"}
