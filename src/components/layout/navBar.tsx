@@ -43,11 +43,12 @@ export const Navbar = () => {
   const dashboard = dashboardMenus[role];
 
   const isOnDashboard = pathname.startsWith("/dashboard");
+  const homeHref = isOnDashboard && dashboard ? dashboard.basePath : "/";
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
-        <Link href="/" className="text-xl font-semibold text-primary">
+        <Link href={homeHref} className="text-xl font-semibold text-primary">
           Absensi Smadip
         </Link>
 
