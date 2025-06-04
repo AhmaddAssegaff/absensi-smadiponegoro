@@ -49,7 +49,7 @@ export const UpdateUserTeacher = adminProcedure
 
       if (classNames !== undefined) {
         const foundClasses = await tx.class.findMany({
-          where: { name: { in: classNames } },
+          where: { ClassName: { in: classNames } },
         });
 
         if (foundClasses.length !== classNames.length) {
@@ -68,7 +68,7 @@ export const UpdateUserTeacher = adminProcedure
           if (kelas.homeroomId && kelas.homeroomId !== teacherId) {
             throw new TRPCError({
               code: "CONFLICT",
-              message: `Kelas ${kelas.name} sudah punya wali kelas lain`,
+              message: `Kelas ${kelas.ClassName} sudah punya wali kelas lain`,
             });
           }
           await tx.class.update({

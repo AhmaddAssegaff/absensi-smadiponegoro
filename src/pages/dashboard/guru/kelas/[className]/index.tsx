@@ -15,8 +15,8 @@ export default function DetailClassPage() {
     gender: "FEMALE",
   });
 
-  console.log("className dari URL:", className);
-  console.log("query string:", rawParams);
+  // console.log("className dari URL:", className);
+  // console.log("query string:", rawParams);
   console.log("data", data);
 
   // useEffect(() => {

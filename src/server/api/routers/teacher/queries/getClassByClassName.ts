@@ -7,7 +7,7 @@ export const GetClassByClassName = teacherProcedure
     const { className, gender } = input;
 
     return ctx.db.class.findFirst({
-      where: { name: className, gender: gender },
+      where: { className: className, gender: gender },
       include: {
         homeroom: {
           select: {

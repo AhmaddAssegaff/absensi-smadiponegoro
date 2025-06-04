@@ -7,15 +7,8 @@ import { adminProcedure } from "@/server/api/trpc";
 export const CreateUser = adminProcedure
   .input(createUserSchema)
   .mutation(async ({ ctx, input }) => {
-    const {
-      name,
-      nisn,
-      passwordHash,
-      role,
-      classesAsStudent,
-      homeRoomFor,
-      gender,
-    } = input;
+    const { name, nisn, passwordHash, role, classesAsStudent, homeRoomFor } =
+      input;
 
     await findDuplicateNisn({
       prisma: ctx.db,
@@ -29,12 +22,11 @@ export const CreateUser = adminProcedure
       nisn,
       passwordHash: hashedPassword,
       role,
-      gender,
     };
 
     if (role === "STUDENT" && classesAsStudent) {
       const classRecord = await ctx.db.class.findUnique({
-        where: { name: classesAsStudent },
+        where: { ClassName: classesAsStudent },
         select: { id: true },
       });
 
@@ -56,7 +48,7 @@ export const CreateUser = adminProcedure
 
       for (const className of homeRoomFor) {
         const classRecord = await ctx.db.class.findUnique({
-          where: { name: className },
+          where: { ClassName: className },
           select: { id: true },
         });
 

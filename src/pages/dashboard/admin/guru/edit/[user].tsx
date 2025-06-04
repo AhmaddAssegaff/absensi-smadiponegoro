@@ -81,7 +81,7 @@ export default function DetailUserTeacher() {
         name: userData.name ?? "",
         nisn: userData.nisn ?? "",
         password: "",
-        classNames: userData.homeRoomFor?.map((c) => c.name) ?? [],
+        classNames: userData.homeRoomFor?.map((c) => c.ClassName) ?? [],
       });
     }
   }, [userData, form]);
@@ -127,8 +127,9 @@ export default function DetailUserTeacher() {
                       Kelas Diampu:
                     </p>
                     <p>
-                      {userData.homeRoomFor?.map((k) => k.name).join(", ") ||
-                        "-"}
+                      {userData.homeRoomFor
+                        ?.map((k) => k.ClassName)
+                        .join(", ") || "-"}
                     </p>
                   </div>
                   <div>

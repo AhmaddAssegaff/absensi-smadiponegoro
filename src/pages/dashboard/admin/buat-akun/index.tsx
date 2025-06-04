@@ -32,10 +32,10 @@ import {
   createUserSchema,
 } from "@/shared/validators/admin/createUserSchema";
 import { roles } from "@/shared/constants/role";
-import { Genders } from "@/shared/constants/gender";
 import { classNames } from "@/shared/constants/className";
 import { api } from "@/utils/api";
 import { toast } from "@/hooks/use-toast";
+import { enumToLabel } from "@/helper/enumToLabel";
 
 const inputFields = [
   {
@@ -69,7 +69,6 @@ export default function CreateAccountPage() {
       name: "",
       passwordHash: "",
       role: roles[0],
-      gender: Genders[0],
       classesAsStudent: undefined,
       homeRoomFor: [],
     },
@@ -98,7 +97,6 @@ export default function CreateAccountPage() {
       nisn: values.nisn,
       passwordHash: values.passwordHash,
       role: values.role,
-      gender: values.gender,
       classesAsStudent:
         values.role === "STUDENT" ? values.classesAsStudent : undefined,
       homeRoomFor:
@@ -169,33 +167,6 @@ export default function CreateAccountPage() {
                             {roles.map((role) => (
                               <SelectItem key={role} value={role}>
                                 {role}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>Gender</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value ?? undefined}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih gender" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Genders.map((gender) => (
-                              <SelectItem key={gender} value={gender}>
-                                {gender.replace("_", " ")}
                               </SelectItem>
                             ))}
                           </SelectContent>

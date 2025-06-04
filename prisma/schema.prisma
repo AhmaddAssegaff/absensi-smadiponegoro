@@ -20,7 +20,6 @@ model User {
   name            String
   passwordHash    String
   role            Role
-  gender          Gender
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -36,15 +35,13 @@ model User {
 
 model Class {
   id        String    @id @default(uuid())
-  name      ClassName @unique
-  gender    Gender
+  ClassName ClassName @unique
 
   students  User[]    @relation("SiswaKelas")
 
   homeroomId String?
   homeroom   User?      @relation("WaliKelas", fields: [homeroomId], references: [id])
 
-  @@unique([name, gender], name: "name_gender")
 }
 
 model Attendance {
@@ -95,18 +92,19 @@ enum Role {
   ADMIN
 }
 
-enum Gender {
-  FEMALE
-  MALE
-}
-
 enum ClassName {
-  X_IPA
-  X_IPS
-  XI_IPA
-  XI_IPS
-  XII_IPA
-  XII_IPS
+  X_IPA_PUTRA
+  X_IPS_PUTRI
+  X_IPA_PUTRI
+  X_IPS_PUTRA
+  XI_IPA_PUTRA
+  XI_IPS_PUTRI
+  XI_IPA_PUTRI
+  XI_IPS_PUTRA
+  XII_IPA_PUTRA
+  XII_IPS_PUTRI
+  XII_IPA_PUTRI
+  XII_IPS_PUTRA
 }
 
 enum AttendanceStatus {
