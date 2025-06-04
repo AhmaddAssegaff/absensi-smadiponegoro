@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "@/server/api/trpc";
-import { updateUserShema } from "@/shared/validators/updateUserShema";
+import { updateUserShema } from "@/shared/validators/admin/updateUserShema";
 import { hashPassword } from "@/helper/hash";
 import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
 

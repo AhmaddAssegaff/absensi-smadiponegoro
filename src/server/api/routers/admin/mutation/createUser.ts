@@ -1,14 +1,21 @@
 import { hashPassword } from "@/helper/hash";
 import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
-import { createUserSchema } from "@/shared/validators/createUserSchema";
+import { createUserSchema } from "@/shared/validators/admin/createUserSchema";
 import type { Prisma } from "@prisma/client";
 import { adminProcedure } from "@/server/api/trpc";
 
 export const CreateUser = adminProcedure
   .input(createUserSchema)
   .mutation(async ({ ctx, input }) => {
-    const { name, nisn, passwordHash, role, classesAsStudent, homeRoomFor } =
-      input;
+    const {
+      name,
+      nisn,
+      passwordHash,
+      role,
+      classesAsStudent,
+      homeRoomFor,
+      gender,
+    } = input;
 
     await findDuplicateNisn({
       prisma: ctx.db,
@@ -22,6 +29,7 @@ export const CreateUser = adminProcedure
       nisn,
       passwordHash: hashedPassword,
       role,
+      gender,
     };
 
     if (role === "STUDENT" && classesAsStudent) {

@@ -22,7 +22,7 @@ import { SectionContiner } from "@/components/layout/sectionContiner";
 import {
   type UpdateUserInput,
   updateUserShema,
-} from "@/shared/validators/updateUserShema";
+} from "@/shared/validators/admin/updateUserShema";
 import { classNames } from "@/shared/constants/className";
 
 export default function DetailUserTeacher() {
@@ -91,7 +91,7 @@ export default function DetailUserTeacher() {
   const IsTeacher = userRole === "TEACHER";
 
   return (
-    <PageContainer variantBg="secondary">
+    <PageContainer center variantBg="secondary">
       <SectionContiner>
         <div className="mx-auto max-w-2xl space-y-6">
           <div className="mb-6 text-center">

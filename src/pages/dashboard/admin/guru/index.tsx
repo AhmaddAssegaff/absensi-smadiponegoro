@@ -18,7 +18,7 @@ export default function ListTeacherAdminPage() {
   });
 
   return (
-    <PageContainer center={true} variantBg={"secondary"}>
+    <PageContainer center variantBg={"secondary"}>
       <SectionContiner>
         <div className="mb-6 text-center">
           <h1 className="mb-1 text-3xl font-bold text-foreground">

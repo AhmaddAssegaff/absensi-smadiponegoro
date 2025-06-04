@@ -20,6 +20,7 @@ model User {
   name            String
   passwordHash    String
   role            Role
+  gender          Gender
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -36,11 +37,14 @@ model User {
 model Class {
   id        String    @id @default(uuid())
   name      ClassName @unique
+  gender    Gender
 
   students  User[]    @relation("SiswaKelas")
 
   homeroomId String?
   homeroom   User?      @relation("WaliKelas", fields: [homeroomId], references: [id])
+
+  @@unique([name, gender], name: "name_gender")
 }
 
 model Attendance {
@@ -89,6 +93,11 @@ enum Role {
   STUDENT
   TEACHER
   ADMIN
+}
+
+enum Gender {
+  FEMALE
+  MALE
 }
 
 enum ClassName {

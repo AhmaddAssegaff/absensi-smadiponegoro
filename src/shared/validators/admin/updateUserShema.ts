@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ClassName } from "../constants/className";
+import { ClassName } from "@/shared/constants/className";
 
 export const updateUserShema = z.object({
   id: z.string(),

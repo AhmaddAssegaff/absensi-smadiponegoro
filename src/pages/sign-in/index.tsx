@@ -71,9 +71,9 @@ export default function SignInPage() {
   };
 
   return (
-    <PageContainer className="z-50" center={true} variantBg={"secondary"}>
+    <PageContainer center variantBg={"secondary"}>
       <SectionContiner>
-        <Card className="w-[400px]">
+        <Card>
           <CardHeader>
             <CardTitle className="text-center">
               Welcome To Sistem Absensi Smadip

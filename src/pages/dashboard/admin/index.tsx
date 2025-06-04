@@ -3,7 +3,7 @@ import { SectionContiner } from "@/components/layout/sectionContiner";
 
 export default function DashboardAdminPage() {
   return (
-    <PageContainer center={true} variantBg={"secondary"}>
+    <PageContainer center variantBg={"secondary"}>
       <SectionContiner>
         <div>welcome dashboard page</div>
       </SectionContiner>
