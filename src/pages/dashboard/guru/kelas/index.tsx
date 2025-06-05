@@ -2,7 +2,7 @@ import { PageContainer } from "@/components/layout/pageContainer";
 import { SectionContiner } from "@/components/layout/sectionContiner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatClassNameToUrl } from "@/helper/classNameFormatter";
+import { enumValueToUrl, formatClassNameLabel } from "@/helper/enumFormatter";
 import { api } from "@/utils/api";
 import Link from "next/link";
 
@@ -34,12 +34,12 @@ export default function ListClassPage() {
             classes?.map((kelas) => (
               <Link
                 key={kelas.id}
-                href={`/dashboard/guru/kelas/${formatClassNameToUrl(kelas.ClassName as string)}`}
+                href={`/dashboard/guru/kelas/${enumValueToUrl(kelas.ClassName)}`}
                 className="rounded-xl transition hover:shadow-md"
               >
                 <Card className="p-4">
                   <div className="text-base font-semibold">
-                    {kelas.ClassName}
+                    {formatClassNameLabel(kelas.ClassName)}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     Wali Kelas: {kelas.homeroom?.name ?? "-"}

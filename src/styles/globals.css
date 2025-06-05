@@ -64,11 +64,6 @@
   color: hsl(var(--accent-foreground));
 }
 
-.pageContainerBG-secondary {
-  background-color: hsl(var(--secondary));
-  color: hsl(var(--accent-foreground));
-}
-
 @layer base {
   * {
     @apply border-border;

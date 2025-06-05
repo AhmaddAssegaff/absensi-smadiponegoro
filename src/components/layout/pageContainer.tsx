@@ -7,7 +7,7 @@ const pageContainer = cva("min-h-screen w-full px-4 py-8 md:px-8 lg:px-16", {
   variants: {
     variantBg: {
       primary: "pageContainerBG-primary",
-      secondary: "pageContainerBG-secondary",
+      secondary: "bg-muted",
     },
     center: {
       true: "flex items-center justify-center",

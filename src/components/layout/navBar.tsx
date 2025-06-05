@@ -1,7 +1,8 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { Button } from "../ui/button";
 import { useRouter } from "next/router";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 const dashboardMenus: Record<
   string,
@@ -62,16 +63,25 @@ export const Navbar = () => {
           )}
 
           {isOnDashboard &&
-            dashboard?.menus.map((menu) => (
-              <Link key={menu.path} href={menu.path}>
-                <Button
-                  variant={pathname === menu.path ? "default" : "ghost"}
-                  className="text-base"
-                >
-                  {menu.label}
-                </Button>
-              </Link>
+            dashboard?.menus.map((menu, index) => (
+              <div key={menu.path} className="flex items-center gap-2">
+                <Link href={menu.path}>
+                  <Button
+                    variant={pathname === menu.path ? "default" : "ghost"}
+                    className="text-base"
+                  >
+                    {menu.label}
+                  </Button>
+                </Link>
+                {index < dashboard.menus.length - 1 && (
+                  <Separator orientation="vertical" className="h-6" />
+                )}
+              </div>
             ))}
+
+          {!isOnDashboard && (
+            <Separator orientation="vertical" className="h-6" />
+          )}
 
           {!isOnDashboard && (
             <Button
