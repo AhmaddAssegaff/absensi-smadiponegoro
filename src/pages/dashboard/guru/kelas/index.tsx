@@ -6,7 +6,7 @@ import { enumValueToUrl, formatClassNameLabel } from "@/helper/enumFormatter";
 import { api } from "@/utils/api";
 import Link from "next/link";
 
-export default function ListClassPage() {
+export default function AllClassPage() {
   const {
     data: classes,
     isLoading,

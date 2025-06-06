@@ -28,6 +28,10 @@ export default function DetailClassPage() {
   return (
     <PageContainer center variantBg="secondary">
       <SectionContiner>
+        <div>
+          Page guru untuk READ data absensi siswanya per keals atau per nanti di
+          buat spesifik satu anak
+        </div>
         {isLoading ? (
           <Card className="space-y-4 p-6">
             <div className="text-center">
