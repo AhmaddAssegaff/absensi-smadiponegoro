@@ -1,0 +1,8 @@
+{
+  "cron": [
+    {
+      "path": "/api/cron/update-qr",
+      "schedule": "59 16 * * *"
+    }
+  ]
+}

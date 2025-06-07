@@ -89,6 +89,9 @@ importers:
       next-auth:
         specifier: ^4.24.7
         version: 4.24.11(next@14.2.29(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      node-cron:
+        specifier: ^4.1.0
+        version: 4.1.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -2067,6 +2070,10 @@ packages:
         optional: true
       sass:
         optional: true
+
+  node-cron@4.1.0:
+    resolution: {integrity: sha512-OS+3ORu+h03/haS6Di8Qr7CrVs4YaKZZOynZwQpyPZDnR3tqRbwJmuP2gVR16JfhLgyNlloAV1VTrrWlRogCFA==}
+    engines: {node: '>=6.0.0'}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -4747,6 +4754,8 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
+
+  node-cron@4.1.0: {}
 
   normalize-path@3.0.0: {}
 
