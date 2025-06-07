@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 const pageContainer = cva("min-h-screen w-full px-4 py-8 md:px-8 lg:px-16", {
   variants: {
     variantBg: {
-      primary: "pageContainerBG-primary",
+      primary: "bg-primary",
       secondary: "bg-muted",
     },
     center: {

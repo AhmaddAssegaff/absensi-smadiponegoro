@@ -108,11 +108,6 @@
   }
 }
 
-.pageContainerBG-primary {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--accent-foreground));
-}
-
 @layer base {
   * {
     @apply border-border;

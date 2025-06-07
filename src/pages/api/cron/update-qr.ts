@@ -1,15 +1,14 @@
 import { db } from "@/server/db";
 import { env } from "@/env";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { endOfDay } from "date-fns";
 
 function generateCode(): string {
   return Math.random().toString(36).substring(2, 10);
 }
 
 function getEndOfToday(): Date {
-  const now = new Date();
-  now.setHours(23, 59, 59, 999);
-  return now;
+  return endOfDay(new Date());
 }
 
 export default async function handler(

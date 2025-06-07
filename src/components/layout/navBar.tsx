@@ -24,6 +24,7 @@ const dashboardMenus: Record<
     menus: [
       { label: "Kelas Saya", path: "/dashboard/guru/kelas-saya" },
       { label: "Semua Kelas", path: "/dashboard/guru/kelas" },
+      { label: "QR", path: "/dashboard/guru/qr" },
     ],
   },
   student: {
