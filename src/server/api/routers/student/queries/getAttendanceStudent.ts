@@ -1,7 +1,10 @@
 import { studentProcedure } from "@/server/api/trpc";
+import { paginationShema } from "@/shared/validators/common/paginationShema";
 
-export const GetAttendanceStudent = studentProcedure.query(
-  async ({ ctx, input, signal }) => {
+export const GetAttendanceStudent = studentProcedure
+  .input(paginationShema)
+  .query(async ({ ctx, input }) => {
+    const { limit, page, order } = input;
     const userNISN = ctx.session?.user.nisn;
 
     return await ctx.db.attendance.findMany({
@@ -16,9 +19,10 @@ export const GetAttendanceStudent = studentProcedure.query(
         description: true,
         createdAt: true,
       },
+      skip: (page - 1) * limit,
+      take: limit,
       orderBy: {
         createdAt: "desc",
       },
     });
-  },
-);
+  });

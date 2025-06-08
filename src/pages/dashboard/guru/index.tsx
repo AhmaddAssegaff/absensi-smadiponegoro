@@ -1,7 +1,7 @@
 import { PageContainer } from "@/components/layout/pageContainer";
 import { SectionContiner } from "@/components/layout/sectionContiner";
 
-export default function DashboardGuruPage() {
+export default function DashboardTeacherPage() {
   return (
     <PageContainer center={true} variantBg={"secondary"}>
       <SectionContiner>
