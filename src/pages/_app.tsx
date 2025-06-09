@@ -4,9 +4,9 @@ import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
 
 import { Toaster } from "@/components/ui/toaster";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/layout/nav/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { HeaderNav } from "@/components/layout/headerNav";
+import { HeaderNav } from "@/components/layout/nav/headerNav";
 import { api } from "@/utils/api";
 
 import "@/styles/globals.css";

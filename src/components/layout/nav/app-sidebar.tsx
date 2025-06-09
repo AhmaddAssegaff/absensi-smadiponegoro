@@ -2,7 +2,7 @@ import * as React from "react";
 import { Bot, SquareTerminal, BarChart2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 
-import { NavMain } from "@/components/nav-main";
+import { NavMain } from "@/components/layout/nav/nav-main";
 import { Sidebar, SidebarContent, SidebarRail } from "@/components/ui/sidebar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

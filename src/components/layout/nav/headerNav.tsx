@@ -1,5 +1,5 @@
 import { Separator } from "@radix-ui/react-separator";
-import { AuthButton } from "@/components/authButton";
+import { AuthButton } from "@/components/layout/nav/authButton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export const HeaderNav = () => {
