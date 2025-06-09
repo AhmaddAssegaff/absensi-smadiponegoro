@@ -1,14 +1,6 @@
 import { Separator } from "@radix-ui/react-separator";
-import { AuthButton } from "../authButton";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "../ui/breadcrumb";
-import { SidebarTrigger } from "../ui/sidebar";
+import { AuthButton } from "@/components/authButton";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export const HeaderNav = () => {
   return (
@@ -20,19 +12,7 @@ export const HeaderNav = () => {
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
           />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Building Your Application
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <h1 className="text-foreground">SMA Absensi</h1>
         </div>
         <AuthButton />
       </div>
