@@ -35,7 +35,7 @@ export function ChartPieLabel({
   footerChartTitle,
 }: ChartPieLabelProps) {
   return (
-    <Card className="flex flex-col">
+    <Card className="my-8 flex flex-col">
       <CardHeader className="items-center pb-0 text-center">
         <CardTitle>{title}</CardTitle>
         {description && (
@@ -56,7 +56,7 @@ export function ChartPieLabel({
               data={data.filter((d) => d.value > 0)}
               dataKey="value"
               label={({ name, percent }) =>
-                `${name} ${(percent * 100).toFixed(0)}%`
+                name === "Sisa" ? "" : `${name} ${(percent * 100).toFixed(0)}%`
               }
             />
 
