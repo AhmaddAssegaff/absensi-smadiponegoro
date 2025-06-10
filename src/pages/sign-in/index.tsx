@@ -25,9 +25,11 @@ import { PageContainer } from "@/components/layout/pageContainer";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { SectionContiner } from "@/components/layout/sectionContiner";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const formSchema = z.object({
     nisn: z.string().min(2).max(50),
@@ -108,11 +110,24 @@ export default function SignInPage() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Masukkan password"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Masukkan password"
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                          >
+                            {showPassword ? (
+                              <EyeOff size={18} />
+                            ) : (
+                              <Eye size={18} />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormDescription>Password akun kamu.</FormDescription>
                       <FormMessage />
