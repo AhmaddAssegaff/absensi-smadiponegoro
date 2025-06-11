@@ -42,7 +42,7 @@ export const CreateAttendanceStudent = studentProcedure
         user: {
           nisn,
         },
-        date: {
+        dateAttandance: {
           gte: new Date(new Date().setHours(0, 0, 0, 0)),
           lte: new Date(new Date().setHours(23, 59, 59, 999)),
         },
@@ -114,7 +114,7 @@ export const CreateAttendanceStudent = studentProcedure
             user: {
               connect: { nisn },
             },
-            date: now,
+            dateAttandance: now,
             status: terlambat ? "HADIR_TERLAMBAT" : "HADIR_TEPAT_WAKTU",
             description: terlambat ? description! : "Hadir tepat waktu",
           },
