@@ -1,8 +1,10 @@
 import { PageContainer } from "@/components/layout/pageContainer";
 import { api } from "@/utils/api";
-import { DataTable } from "./components/table";
 import { SectionContiner } from "@/components/layout/sectionContiner";
 import { useQueryParams } from "@/hooks/useQueryParams";
+import { type Column, TableWrapper } from "@/components/layout/tableWrapper";
+import { TableCell } from "@/components/ui/table";
+import type { User } from "@/shared/types/trpc";
 
 export default function ListTeacherAdminPage() {
   const { currentPage, currentSortBy, currentOrder } = useQueryParams({
@@ -17,6 +19,20 @@ export default function ListTeacherAdminPage() {
     order: currentOrder,
   });
 
+  const columns = [
+    { key: "name", label: "Nama", sortable: true },
+    { key: "nisn", label: "NISN / Kode Guru", sortable: true },
+    { key: "role", label: "Role", sortable: true },
+  ] satisfies Column<User>[];
+
+  const users = data?.data ?? [];
+
+  const pagination = {
+    total: data?.total ?? 0,
+    page: data?.page ?? 1,
+    totalPages: data?.totalPages ?? 1,
+  };
+
   return (
     <PageContainer center variantBg={"secondary"}>
       <SectionContiner>
@@ -28,16 +44,21 @@ export default function ListTeacherAdminPage() {
             Lihat informasi User secara ringkas.
           </p>
         </div>
-        {error && <p>Error: {error.message}</p>}
-        <DataTable
-          users={data?.data ?? []}
-          Pagination={{
-            page: data?.page ?? 1,
-            total: data?.total ?? 0,
-            totalPages: data?.totalPages ?? 1,
-          }}
+        <TableWrapper<User>
+          columns={columns}
+          data={users}
           isLoading={isLoading}
-        />
+          error={error?.message}
+          pagination={pagination}
+        >
+          {(user) => (
+            <>
+              <TableCell>{user.name}</TableCell>
+              <TableCell>{user.nisn}</TableCell>
+              <TableCell>{user.role}</TableCell>
+            </>
+          )}
+        </TableWrapper>
       </SectionContiner>
     </PageContainer>
   );
