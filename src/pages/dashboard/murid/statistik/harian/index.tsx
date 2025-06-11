@@ -1,16 +1,17 @@
 import { PageContainer } from "@/components/layout/pageContainer";
 import { SectionContiner } from "@/components/layout/sectionContiner";
-import { TableWrapper } from "@/components/layout/tableWrapper";
+import { type Column, TableWrapper } from "@/components/layout/tableWrapper";
 import { TableCell } from "@/components/ui/table";
 import { useQueryParams } from "@/hooks/useQueryParams";
 import { enumToLabel } from "@/helper/enumToLabel";
+import { dateFormater } from "@/helper/dateFormatter";
 import { api } from "@/utils/api";
 import type { Attendance } from "@/shared/types/trpc";
 
 export default function DailyStatisticStudentPage() {
   const { currentPage, currentOrder, currentSortBy } = useQueryParams({
     defaultOrder: "desc",
-    defaultSortBy: "createdAt",
+    defaultSortBy: "dateAttandance",
   });
 
   const { data, isLoading, error } = api.student.GetAttendanceStudent.useQuery({
@@ -21,10 +22,14 @@ export default function DailyStatisticStudentPage() {
   });
 
   const columns = [
-    { key: "createdAt" as const, label: "Dibuat", sortable: true },
+    {
+      key: "dateAttandance" as const,
+      label: "Absensi Pada hari",
+      sortable: true,
+    },
     { key: "status" as const, label: "Status", sortable: true },
     { key: "description" as const, label: "Deskripsi", sortable: false },
-  ];
+  ] satisfies Column<Attendance>[];
 
   const attendances = data?.data ?? [];
 
@@ -41,13 +46,13 @@ export default function DailyStatisticStudentPage() {
           pagination={pagination}
           columns={columns}
           isLoading={isLoading}
-          error={error?.message ?? ""}
+          error={error?.message}
           data={attendances}
         >
           {(attendance) => (
             <>
               <TableCell className="px-4 py-3">
-                {new Date(attendance.createdAt).toLocaleDateString("id-ID")}
+                {dateFormater(attendance.dateAttandance) || "-"}
               </TableCell>
               <TableCell className="px-4 py-3 capitalize">
                 {enumToLabel(attendance.status)}

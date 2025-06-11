@@ -8,6 +8,7 @@ const DEFAULT_VALID_SORT_BY = [
   "createdAt",
   "updatedAt",
   "status",
+  "dateAttandance",
 ] as const;
 
 interface useQueryParamsOptions<SortBy extends string> {

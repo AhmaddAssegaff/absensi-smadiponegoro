@@ -48,14 +48,14 @@ model Attendance {
   id        String    @id @default(uuid())
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  date      DateTime
+  dateAttandance      DateTime
   status    AttendanceStatus
   description String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  @@unique([userId, date])
+  @@unique([userId, dateAttandance])
 }
 
 model AttendanceSummary {

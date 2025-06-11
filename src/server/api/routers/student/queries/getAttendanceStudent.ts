@@ -14,9 +14,8 @@ export const GetAttendanceStudent = studentProcedure
         },
         select: {
           status: true,
-          date: true,
+          dateAttandance: true,
           description: true,
-          createdAt: true,
         },
         skip: (page - 1) * limit,
         take: limit,
