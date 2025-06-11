@@ -1,5 +1,4 @@
-import { hashPassword } from "@/helper/hash";
-import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
+import { findDuplicateNisn, hashPassword } from "@/helper";
 import { createUserSchema } from "@/shared/validators/admin/createUserSchema";
 import type { Prisma } from "@prisma/client";
 import { adminProcedure } from "@/server/api/trpc";

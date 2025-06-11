@@ -1,5 +1,5 @@
 import { adminProcedure } from "@/server/api/trpc";
-import { Role } from "@prisma/client";
+import { Role } from "@/shared/constants/role";
 import { paginationTeacherSchema } from "@/shared/validators/admin/paginationGetAllUser";
 
 export const GetAllTeacher = adminProcedure

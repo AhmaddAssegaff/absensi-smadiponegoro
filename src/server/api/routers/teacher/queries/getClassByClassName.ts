@@ -47,7 +47,7 @@ export const GetClassByClassName = teacherProcedure
             name: true,
             attendances: {
               where: {
-                date: {
+                dateAttandance: {
                   gte: todayStart,
                   lte: todayEnd,
                 },
@@ -55,7 +55,7 @@ export const GetClassByClassName = teacherProcedure
               select: {
                 id: true,
                 status: true,
-                date: true,
+                dateAttandance: true,
                 description: true,
               },
             },

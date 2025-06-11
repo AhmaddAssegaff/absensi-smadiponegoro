@@ -1,4 +1,3 @@
-// TableWrapper.tsx
 import {
   Table,
   TableBody,

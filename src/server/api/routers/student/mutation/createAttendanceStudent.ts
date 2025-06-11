@@ -1,4 +1,4 @@
-import { getDistanceFromLatLonInMeters } from "@/helper/getDistanceFromLatLonInMeters";
+import { getDistanceFromLatLonInMeters } from "@/helper";
 import { studentProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { isAfter, set } from "date-fns";

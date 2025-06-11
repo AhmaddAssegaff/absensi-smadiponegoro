@@ -1,8 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { adminProcedure } from "@/server/api/trpc";
 import { updateUserShema } from "@/shared/validators/admin/updateUserShema";
-import { hashPassword } from "@/helper/hash";
-import { findDuplicateNisn } from "@/helper/findDuplicateNisn";
+import { findDuplicateNisn, hashPassword } from "@/helper";
 
 export const UpdateUserTeacher = adminProcedure
   .input(updateUserShema)
