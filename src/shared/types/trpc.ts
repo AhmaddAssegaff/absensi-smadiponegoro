@@ -5,4 +5,7 @@ type RouterOutput = inferRouterOutputs<AppRouter>;
 
 export type GetAllTeacherOutput = RouterOutput["admin"]["GetAllTeacher"];
 export type User = GetAllTeacherOutput["data"][number];
-export type PaginationMeta = Omit<GetAllTeacherOutput, "data">;
+
+export type GetAttendanceStudent =
+  RouterOutput["student"]["GetAttendanceStudent"];
+export type Attendance = GetAttendanceStudent["data"][number];

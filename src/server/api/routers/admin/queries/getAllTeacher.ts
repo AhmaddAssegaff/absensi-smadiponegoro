@@ -1,9 +1,9 @@
 import { adminProcedure } from "@/server/api/trpc";
 import { Role } from "@prisma/client";
-import { paginationShema } from "@/shared/validators/common/paginationShema";
+import { paginationTeacherSchema } from "@/shared/validators/admin/paginationGetAllUser";
 
 export const GetAllTeacher = adminProcedure
-  .input(paginationShema)
+  .input(paginationTeacherSchema)
   .query(async ({ ctx, input }) => {
     const { page, limit, sortBy, order } = input;
 
