@@ -3,11 +3,13 @@ import { GetClassByClassName } from "@/server/api/routers/teacher/queries/getCla
 import { GetMyClass } from "@/server/api/routers/teacher/queries/getMyClass";
 import { GetQRCode } from "@/server/api/routers/teacher/queries/getQRCode";
 import { GetDetailAttandanceStudentMonthly } from "@/server/api/routers/teacher/queries/getDetailAtandanceStudent";
+import { GetMyClassByClassName } from "@/server/api/routers/teacher/queries/getMyClassByClassName";
 import { createTRPCRouter } from "@/server/api/trpc";
 
 export const teacherRouter = createTRPCRouter({
   GetAllClass,
   GetClassByClassName,
+  GetMyClassByClassName,
   GetMyClass,
   GetQRCode,
   GetDetailAttandanceStudentMonthly,
