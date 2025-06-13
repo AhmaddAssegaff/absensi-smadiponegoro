@@ -42,6 +42,9 @@ export default function DailyStatisticStudentPage() {
   return (
     <PageContainer center variantBg={"secondary"}>
       <SectionContiner>
+        <div className="my-4 text-center">
+          <h1>Daftar Absensi Perhari</h1>
+        </div>
         <TableWrapper<Attendance>
           pagination={pagination}
           columns={columns}

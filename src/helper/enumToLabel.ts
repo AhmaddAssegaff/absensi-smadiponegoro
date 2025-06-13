@@ -1,4 +1,5 @@
 export function enumToLabel(enumValue: string) {
+  if (!enumValue) return;
   return enumValue
     .toLowerCase()
     .split("_")

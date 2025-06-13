@@ -56,71 +56,75 @@ export function TableWrapper<T>({
   };
 
   return (
-    <div className="rounded-lg border bg-white p-6 text-black shadow-lg">
-      <Table className="min-w-full">
-        <TableCaption className="py-2 text-center text-black">
-          Klik kolom untuk sorting
-        </TableCaption>
+    <div className="rounded-lg border bg-white p-4 text-black shadow-lg">
+      <div className="w-full overflow-x-auto">
+        <Table className="min-w-[700px]">
+          <TableCaption className="py-2 text-center text-black">
+            Klik kolom untuk sorting
+          </TableCaption>
 
-        <TableHeader>
-          <TableRow>
-            {columns.map((col) => (
-              <TableHead
-                key={String(col.key)}
-                onClick={
-                  col.sortable ? () => handleSort(String(col.key)) : undefined
-                }
-                className="select-none px-4 py-3 text-left font-semibold text-black"
-              >
-                <div className="flex items-center gap-1">
-                  {col.label}
-                  {currentSortBy === col.key && (
-                    <span>{currentOrder === "asc" ? "▲" : "▼"}</span>
-                  )}
-                </div>
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {error ? (
+          <TableHeader>
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="py-6 text-center text-red-500"
-              >
-                {error}
-              </TableCell>
+              {columns.map((col) => (
+                <TableHead
+                  key={String(col.key)}
+                  onClick={
+                    col.sortable ? () => handleSort(String(col.key)) : undefined
+                  }
+                  className="cursor-pointer select-none px-4 py-3 text-left font-semibold text-black"
+                >
+                  <div className="flex items-center gap-1">
+                    {col.label}
+                    {currentSortBy === col.key && (
+                      <span>{currentOrder === "asc" ? "▲" : "▼"}</span>
+                    )}
+                  </div>
+                </TableHead>
+              ))}
             </TableRow>
-          ) : isLoading ? (
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            [...Array(10)].map((_, i) => (
-              <TableRow key={i}>
-                {columns.map((col) => (
-                  <TableCell key={String(col.key)} className="px-4 py-3">
-                    <Skeleton className="h-4 w-full" />
-                  </TableCell>
-                ))}
+          </TableHeader>
+
+          <TableBody>
+            {error ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="py-6 text-center text-red-500"
+                >
+                  {error}
+                </TableCell>
               </TableRow>
-            ))
-          ) : data.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="py-6 text-center italic"
-              >
-                Tidak ada data
-              </TableCell>
-            </TableRow>
-          ) : (
-            data.map((item, i) => <TableRow key={i}>{children(item)}</TableRow>)
-          )}
-        </TableBody>
-      </Table>
+            ) : isLoading ? (
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              [...Array(10)].map((_, i) => (
+                <TableRow key={i}>
+                  {columns.map((col) => (
+                    <TableCell key={String(col.key)} className="px-4 py-3">
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="py-6 text-center italic"
+                >
+                  Tidak ada data
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((item, i) => (
+                <TableRow key={i}>{children(item)}</TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-2">
+        <div className="flex justify-center gap-2">
           <Button
             variant={currentPage > 1 ? "secondary" : "outline"}
             disabled={currentPage <= 1}
@@ -138,7 +142,8 @@ export function TableWrapper<T>({
             Berikutnya →
           </Button>
         </div>
-        <div className="flex select-none flex-wrap gap-6 text-sm">
+
+        <div className="flex flex-col items-center gap-1 text-sm sm:flex-row sm:gap-6">
           <p>
             Halaman: <span className="font-semibold">{pagination.page}</span>
           </p>

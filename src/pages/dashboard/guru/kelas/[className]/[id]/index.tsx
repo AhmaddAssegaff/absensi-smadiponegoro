@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 import {
   ChartPieLabel,
@@ -20,19 +21,28 @@ import { getYear } from "date-fns";
 
 type AttendanceKey = keyof typeof LABEL_MAP;
 
-export default function MonthStatisticStudentPage() {
+export default function DetailStudentAttendancePage() {
+  const router = useRouter();
+  const { id } = router.query as { id: string };
+
   const now = new Date();
   const [month, setMonth] = useState(String(now.getMonth() + 1));
   const [year, setYear] = useState(String(now.getFullYear()));
 
-  const thisYear = getYear(new Date());
+  const thisYear = getYear(now);
   const yearOptions = Array.from({ length: 5 }, (_, i) => thisYear - 3 + i);
 
   const { data: attendanceMonthly, isLoading } =
-    api.student.GetAttendanceSummaryStudent.useQuery({
-      months: Number(month),
-      years: Number(year),
-    });
+    api.teacher.GetDetailAttandanceStudentMonthly.useQuery(
+      {
+        id,
+        month: Number(month),
+        year: Number(year),
+      },
+      {
+        enabled: !!id,
+      },
+    );
 
   const totalHari = attendanceMonthly?.totalHari ?? 0;
 
@@ -48,7 +58,7 @@ export default function MonthStatisticStudentPage() {
     <PageContainer center variantBg="secondary">
       <SectionContiner>
         <div className="mb-4">
-          <h1 className="text-xl font-semibold">Catatan Kehadiran Bulanan</h1>
+          <h1 className="text-xl font-semibold">Statistik Kehadiran Siswa</h1>
           <div className="mt-4 flex items-center gap-4">
             <div>
               <label className="mb-1 block text-sm font-medium">Bulan</label>
@@ -97,12 +107,12 @@ export default function MonthStatisticStudentPage() {
         ) : (
           <section>
             {sortedKeys.map((key) => {
-              const value = attendanceMonthly[key];
+              const value = attendanceMonthly?.[key] ?? 0;
               const percentage =
-                totalHari >= 1 ? ((value / totalHari) * 100).toFixed(1) : "0.0";
+                totalHari > 0 ? ((value / totalHari) * 100).toFixed(1) : "0.0";
 
               const chartData =
-                value > 0
+                totalHari > 0
                   ? [
                       {
                         name: LABEL_MAP[key],
@@ -117,8 +127,13 @@ export default function MonthStatisticStudentPage() {
                     ]
                   : [
                       {
+                        name: LABEL_MAP[key],
+                        value: 0,
+                        fill: COLOR_MAP[key],
+                      },
+                      {
                         name: "Sisa",
-                        value: totalHari,
+                        value: 1,
                         fill: "#e5e7eb",
                       },
                     ];

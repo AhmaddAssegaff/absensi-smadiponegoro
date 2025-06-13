@@ -1,6 +1,6 @@
 import { PageContainer } from "@/components/layout/pageContainer";
 import { SectionContiner } from "@/components/layout/sectionContiner";
-import { ChartPieLabel } from "@/components/layout/chartPieLabel";
+import { ChartPieLabel } from "@/components/layout/pieChart/chartPieLabel";
 import { api } from "@/utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
