@@ -1,19 +1,12 @@
 import { getDistanceFromLatLonInMeters } from "@/helper";
 import { studentProcedure } from "@/server/api/trpc";
+import { CreateAttendanceStudentShema } from "@/shared/validators/teacher/createAttendanceStudentShema";
 import { TRPCError } from "@trpc/server";
 import { isAfter, set } from "date-fns";
 import { env } from "@/env";
-import { z } from "zod";
 
 export const CreateAttendanceStudent = studentProcedure
-  .input(
-    z.object({
-      code: z.string(),
-      description: z.string().optional(),
-      latitude: z.number(),
-      longitude: z.number(),
-    }),
-  )
+  .input(CreateAttendanceStudentShema)
   .mutation(async ({ ctx, input, signal }) => {
     const { code, description, latitude, longitude } = input;
     const nisn = ctx.session?.user.nisn;
