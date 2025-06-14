@@ -1,12 +1,12 @@
 import { teacherProcedure } from "@/server/api/trpc";
 import { getClassByClassNameShema } from "@/shared/validators/teacher/getClassByClassNameShema";
 import { TRPCError } from "@trpc/server";
-import { parseISO, startOfDay, endOfDay } from "date-fns";
+import { startOfDay, endOfDay } from "date-fns";
 
 export const GetMyClassByClassName = teacherProcedure
   .input(getClassByClassNameShema)
   .query(async ({ ctx, input }) => {
-    const { className, date } = input;
+    const { className } = input;
 
     if (!className) {
       throw new TRPCError({
@@ -15,7 +15,7 @@ export const GetMyClassByClassName = teacherProcedure
       });
     }
 
-    const targetDate = date ? parseISO(date) : new Date();
+    const targetDate = new Date();
 
     if (isNaN(targetDate.getTime())) {
       throw new TRPCError({
