@@ -7,7 +7,6 @@ import { api } from "@/utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
 import { dateFormater, enumToLabel } from "@/helper";
 import {
   Table,
@@ -28,19 +27,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AttendanceStatus } from "@/shared/constants/attendanceStatus";
+import {
+  type AttendanceFormValues,
+  updateManyAttendanceStudentSchema,
+} from "@/shared/validators/teacher/updateManyAttandanceStudentShema";
 import { toast } from "@/hooks/use-toast";
 import { TrashIcon } from "lucide-react";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function MyClassDetailTeacherPage() {
   const router = useRouter();
   const className = urlToEnumValue(router.query.className as ClassName);
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
-  const [formData, setFormData] = useState<
-    Record<
-      string,
-      { status: AttendanceStatus; description: string | undefined }
-    >
-  >({});
+  const form = useForm<AttendanceFormValues>({
+    resolver: zodResolver(updateManyAttendanceStudentSchema),
+    defaultValues: {
+      attendances: [],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "attendances",
+  });
 
   const utils = api.useUtils();
 
@@ -55,12 +64,8 @@ export default function MyClassDetailTeacherPage() {
 
   const updateMutation = api.teacher.UpdateManyAttandanceStudents.useMutation({
     onSuccess: () => {
-      setEditing({});
-      setFormData({});
-      toast({
-        title: "Berhasil",
-        description: "Absensi berhasil di update.",
-      });
+      form.reset();
+      toast({ title: "Berhasil", description: "Absensi berhasil di update." });
       void utils.teacher.GetMyClassByClassName.invalidate();
     },
     onError: (err) => {
@@ -71,68 +76,6 @@ export default function MyClassDetailTeacherPage() {
       });
     },
   });
-
-  const handleEdit = (
-    studentId: string,
-    currentStatus?: AttendanceStatus,
-    currentDescription?: string,
-  ) => {
-    setEditing((prev) => ({ ...prev, [studentId]: true }));
-    setFormData((prev) => ({
-      ...prev,
-      [studentId]: {
-        status: currentStatus ?? "ALPA",
-        description: currentDescription ?? "",
-      },
-    }));
-  };
-
-  const handleChange = (
-    studentId: string,
-    field: "status" | "description",
-    value: string,
-  ) => {
-    setFormData((prev) => {
-      const existing = prev[studentId] ?? {
-        status: "ALPA",
-        description: "",
-      };
-
-      return {
-        ...prev,
-        [studentId]: {
-          ...existing,
-          [field]: value,
-        },
-      };
-    });
-  };
-
-  const handleCancel = (studentId: string) => {
-    setEditing((prev) => {
-      const updated = { ...prev };
-      delete updated[studentId];
-      return updated;
-    });
-
-    setFormData((prev) => {
-      const updated = { ...prev };
-      delete updated[studentId];
-      return updated;
-    });
-  };
-
-  const handleSaveAll = () => {
-    const attendances = Object.entries(formData).map(([studentId, data]) => ({
-      studentId,
-      status: data.status,
-      description: data.description,
-    }));
-
-    updateMutation.mutate({
-      attendances,
-    });
-  };
 
   const deleteMutation = api.teacher.DeleteTodayAttendanceStudent.useMutation({
     onSuccess: () => {
@@ -151,11 +94,41 @@ export default function MyClassDetailTeacherPage() {
     },
   });
 
+  const handleEdit = (
+    studentId: string,
+    currentStatus?: AttendanceStatus,
+    currentDescription?: string,
+  ) => {
+    const index = form
+      .getValues("attendances")
+      .findIndex((a) => a.studentId === studentId);
+    if (index === -1) {
+      append({
+        studentId,
+        status: currentStatus ?? "ALPA",
+        description: currentDescription ?? "",
+      });
+    }
+  };
+
+  const handleCancel = (studentId: string) => {
+    const index = form
+      .getValues("attendances")
+      .findIndex((a) => a.studentId === studentId);
+    if (index !== -1) {
+      remove(index);
+    }
+  };
+
+  const handleSaveAll = () => {
+    void form.handleSubmit((data) => {
+      updateMutation.mutate(data);
+    })();
+  };
+
   const handleDelete = (studentId: string) => {
     deleteMutation.mutate({ studentId });
   };
-
-  const hasPendingEdits = Object.keys(formData).length > 0;
 
   return (
     <PageContainer center variantBg="secondary">
@@ -187,23 +160,19 @@ export default function MyClassDetailTeacherPage() {
 
           <Card className="p-6">
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <h2 className="text-lg font-semibold">Daftar Siswa</h2>
-              </div>
-
+              <h2 className="text-lg font-semibold">Daftar Siswa</h2>
               <div className="w-full overflow-x-auto">
-                <Table className="min-w-[600px]">
+                <Table className="min-w-[1000px]">
                   <TableCaption>
                     Daftar absensi siswa pada hari ini
                   </TableCaption>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="min-w-[200px]">Nama</TableHead>
-                      <TableHead className="min-w-[180px]">
-                        Absensi Pada Hari
-                      </TableHead>
-                      <TableHead className="min-w-[120px]">Status</TableHead>
-                      <TableHead className="min-w-[240px]">Deskripsi</TableHead>
+                      <TableHead>Nama</TableHead>
+                      <TableHead>Kelas</TableHead>
+                      <TableHead>Tanggal</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Deskripsi</TableHead>
                       <TableHead>Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -211,93 +180,67 @@ export default function MyClassDetailTeacherPage() {
                     {isLoading ? (
                       Array.from({ length: 5 }).map((_, i) => (
                         <TableRow key={i}>
-                          <TableCell>
-                            <Skeleton className="h-4 w-40" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-32" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-24" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-52" />
-                          </TableCell>
-                          <TableCell>
-                            <Skeleton className="h-4 w-20" />
-                          </TableCell>
+                          {Array.from({ length: 6 }).map((_, j) => (
+                            <TableCell key={j}>
+                              <Skeleton className="h-4 w-40" />
+                            </TableCell>
+                          ))}
                         </TableRow>
                       ))
-                    ) : error ? (
-                      <TableRow>
-                        <TableCell
-                          colSpan={5}
-                          className="text-center text-red-500"
-                        >
-                          Terjadi kesalahan:{" "}
-                          {error.data?.httpStatus ?? "Unknown"}{" "}
-                          {error.data?.code ?? "Unknown"}
-                        </TableCell>
-                      </TableRow>
                     ) : detailClass?.students.length ? (
                       detailClass.students.map((student) => {
+                        const index = fields.findIndex(
+                          (a) => a.studentId === student.id,
+                        );
                         const attendance = student.attendances[0];
-                        const isEditing = editing[student.id];
+                        const editing = index !== -1;
 
                         return (
                           <TableRow key={student.id}>
-                            <TableCell className="font-medium">
-                              {student.name}
+                            <TableCell>{student.name}</TableCell>
+                            <TableCell>
+                              {student.classesAsStudent?.ClassName}
                             </TableCell>
                             <TableCell>
                               {attendance?.dateAttandance
                                 ? dateFormater(attendance.dateAttandance)
                                 : "-"}
                             </TableCell>
-
-                            {isEditing ? (
+                            {editing ? (
                               <>
                                 <TableCell>
-                                  <Select
-                                    value={formData[student.id]?.status}
-                                    onValueChange={(val) =>
-                                      handleChange(
-                                        student.id,
-                                        "status",
-                                        val as AttendanceStatus,
-                                      )
-                                    }
-                                  >
-                                    <SelectTrigger className="w-[140px]">
-                                      <SelectValue placeholder="Pilih status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {Object.values(AttendanceStatus).map(
-                                        (status) => (
-                                          <SelectItem
-                                            key={status}
-                                            value={status}
-                                          >
-                                            {enumToLabel(status)}
-                                          </SelectItem>
-                                        ),
-                                      )}
-                                    </SelectContent>
-                                  </Select>
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    value={formData[student.id]?.description}
-                                    onChange={(e) =>
-                                      handleChange(
-                                        student.id,
-                                        "description",
-                                        e.target.value,
-                                      )
-                                    }
+                                  <Controller
+                                    control={form.control}
+                                    name={`attendances.${index}.status`}
+                                    render={({ field }) => (
+                                      <Select
+                                        value={field.value}
+                                        onValueChange={field.onChange}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Pilih status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {Object.values(AttendanceStatus).map(
+                                            (s) => (
+                                              <SelectItem key={s} value={s}>
+                                                {enumToLabel(s)}
+                                              </SelectItem>
+                                            ),
+                                          )}
+                                        </SelectContent>
+                                      </Select>
+                                    )}
                                   />
                                 </TableCell>
-                                <TableCell className="space-x-2">
+                                <TableCell>
+                                  <Controller
+                                    control={form.control}
+                                    name={`attendances.${index}.description`}
+                                    render={({ field }) => <Input {...field} />}
+                                  />
+                                </TableCell>
+                                <TableCell>
                                   <Button
                                     size="sm"
                                     variant="outline"
@@ -312,20 +255,18 @@ export default function MyClassDetailTeacherPage() {
                                 <TableCell>
                                   <Badge
                                     variant={
-                                      attendance?.status === "ALPA" ||
-                                      attendance?.status === "HADIR_TERLAMBAT"
+                                      attendance?.status === "ALPA"
                                         ? "destructive"
                                         : "secondary"
                                     }
                                   >
-                                    {enumToLabel(attendance?.status ?? "") ??
-                                      "Belum ada keterangan"}
+                                    {enumToLabel(attendance?.status ?? "")}
                                   </Badge>
                                 </TableCell>
                                 <TableCell>
                                   {attendance?.description ?? "-"}
                                 </TableCell>
-                                <TableCell className="flex items-center gap-2">
+                                <TableCell className="flex gap-2">
                                   <Button
                                     size="sm"
                                     onClick={() =>
@@ -356,7 +297,7 @@ export default function MyClassDetailTeacherPage() {
                     ) : (
                       <TableRow>
                         <TableCell
-                          colSpan={5}
+                          colSpan={6}
                           className="text-center text-muted-foreground"
                         >
                           Tidak ada data siswa.
@@ -367,7 +308,7 @@ export default function MyClassDetailTeacherPage() {
                 </Table>
               </div>
 
-              {hasPendingEdits && (
+              {fields.length > 0 && (
                 <div className="flex justify-end">
                   <Button
                     onClick={handleSaveAll}

@@ -47,6 +47,7 @@ export const GetMyClassByClassName = teacherProcedure
           select: {
             id: true,
             name: true,
+            classesAsStudent: true,
             attendances: {
               where: {
                 dateAttandance: {

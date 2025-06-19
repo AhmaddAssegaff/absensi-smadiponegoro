@@ -1,10 +1,10 @@
 import { teacherProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { type AttendanceStatus } from "@/shared/constants/attendanceStatus";
-import { updateManyAttendanceStudentShema } from "@/shared/validators/teacher/updateManyAttandanceStudentShema";
+import { updateManyAttendanceStudentSchema } from "@/shared/validators/teacher/updateManyAttandanceStudentShema";
 
 export const UpdateManyAttandanceStudents = teacherProcedure
-  .input(updateManyAttendanceStudentShema)
+  .input(updateManyAttendanceStudentSchema)
   .mutation(async ({ input, ctx }) => {
     const { attendances } = input;
     const teacherId = ctx.session?.user.id;
