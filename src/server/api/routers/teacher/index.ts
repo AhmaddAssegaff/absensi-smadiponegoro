@@ -5,7 +5,7 @@ import { GetQRCode } from "@/server/api/routers/teacher/queries/getQRCode";
 import { GetDetailAttandanceStudentMonthly } from "@/server/api/routers/teacher/queries/getDetailAtandanceStudent";
 import { GetMyClassByClassName } from "@/server/api/routers/teacher/queries/getMyClassByClassName";
 import { UpdateManyAttandanceStudents } from "@/server/api/routers/teacher/mutation/updateManyAttendanceStudents";
-import { DeleteTodayAttendanceStudent } from "@/server/api/routers/teacher/mutation/DeleteTodayAttendanceStudent";
+import { DeleteTodayAttendanceStudent } from "@/server/api/routers/teacher/mutation/deleteTodayAttendanceStudent";
 import { createTRPCRouter } from "@/server/api/trpc";
 
 export const teacherRouter = createTRPCRouter({
