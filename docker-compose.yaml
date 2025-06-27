@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgre_V2
+    ports:
+      - "5455:5432"
+    environment:
+      POSTGRES_DB: absensiSmadipDb
+      POSTGRES_USER: absensiSmadipDb_user
+      POSTGRES_PASSWORD: absensiSmadipDb123
+    volumes:
+      - D:/docker/absensiSmadipDb:/var/lib/postgresql/data
