@@ -7,7 +7,7 @@ import { env } from "@/env";
 
 export const CreateAttendanceStudent = studentProcedure
   .input(CreateAttendanceStudentShema)
-  .mutation(async ({ ctx, input, signal }) => {
+  .mutation(async ({ ctx, input }) => {
     const { code, description, latitude, longitude } = input;
     const nisn = ctx.session?.user.nisn;
 

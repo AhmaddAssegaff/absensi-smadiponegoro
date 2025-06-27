@@ -5,11 +5,8 @@ import { api } from "@/utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function longTimeStatisticStudentPage() {
-  const {
-    data: attendanceSummary,
-    isLoading,
-    error,
-  } = api.student.GetAttendanceSummaryAllTime.useQuery();
+  const { data: attendanceSummary, isLoading } =
+    api.student.GetAttendanceSummaryAllTime.useQuery();
 
   if (isLoading) {
     <Skeleton />;

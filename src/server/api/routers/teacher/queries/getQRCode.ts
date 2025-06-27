@@ -1,6 +1,6 @@
 import { teacherProcedure } from "@/server/api/trpc";
 
-export const GetQRCode = teacherProcedure.query(({ ctx, input, signal }) => {
+export const GetQRCode = teacherProcedure.query(({ ctx }) => {
   return ctx.db.qRCode.findFirst({
     select: {
       code: true,

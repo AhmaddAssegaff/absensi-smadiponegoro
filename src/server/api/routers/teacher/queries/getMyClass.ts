@@ -1,6 +1,6 @@
 import { teacherProcedure } from "@/server/api/trpc";
 
-export const GetMyClass = teacherProcedure.query(({ ctx, input }) => {
+export const GetMyClass = teacherProcedure.query(({ ctx }) => {
   const teacherId = ctx.session?.user.id;
 
   return ctx.db.class.findFirst({
