@@ -8,6 +8,7 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret });
   const pathname = request.nextUrl.pathname;
 
+  console.log("COOKIES:", request.cookies.getAll());
   console.log("TOKEN DI MIDDLEWARE:", token);
   console.log("SECRET:", secret);
   console.log("URL:", request.nextUrl.pathname);
