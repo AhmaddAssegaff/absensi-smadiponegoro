@@ -3,5 +3,11 @@
     "env": {
       "NEXT_DISABLE_LINT": "true"
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/update-qr",
+      "schedule": "0 13 * * *"
+    }
+  ]
 }
