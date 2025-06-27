@@ -1,6 +1,7 @@
 import { Separator } from "@radix-ui/react-separator";
 import { AuthButton } from "@/components/layout/nav/authButton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export const HeaderNav = () => {
   return (
@@ -12,7 +13,9 @@ export const HeaderNav = () => {
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
           />
-          <h1 className="text-foreground">SMA Absensi</h1>
+          <Link href={"/"}>
+            <h1 className="text-foreground">SMA Absensi</h1>
+          </Link>
         </div>
         <AuthButton />
       </div>
