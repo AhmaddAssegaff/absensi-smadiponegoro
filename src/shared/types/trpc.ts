@@ -9,3 +9,6 @@ export type User = GetAllTeacherOutput["data"][number];
 export type GetAttendanceStudent =
   RouterOutput["student"]["GetAttendanceStudent"];
 export type Attendance = GetAttendanceStudent["data"][number];
+
+export type GetAllStudentsOutput =
+  RouterOutput["admin"]["GetAllStudents"]["data"][number];

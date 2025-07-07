@@ -20,7 +20,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             isActive: true,
             items: [
               { title: "Buat Akun", url: "/dashboard/admin/buat-akun" },
-              { title: "Kelas", url: "/dashboard/admin/kelas" },
+              { title: "murid", url: "/dashboard/admin/murid" },
               { title: "Guru", url: "/dashboard/admin/guru" },
             ],
           },
