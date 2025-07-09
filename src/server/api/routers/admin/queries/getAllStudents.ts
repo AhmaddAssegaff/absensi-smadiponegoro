@@ -1,16 +1,33 @@
 import { adminProcedure } from "@/server/api/trpc";
-import { paginationTeacherSchema } from "@/shared/validators/admin/paginationGetAllUser";
+import { paginationStudentsSchema } from "@/shared/validators/admin/paginationGetAllUserStudent";
 import { Role } from "@/shared/constants/role";
+import { Prisma } from "@prisma/client";
 
 export const GetAllStudents = adminProcedure
-  .input(paginationTeacherSchema)
+  .input(paginationStudentsSchema)
   .query(async ({ ctx, input }) => {
-    const { page, limit, sortBy, order } = input;
+    const { page, limit, sortBy, order, search } = input;
 
     const where = {
       role: {
         notIn: [Role.ADMIN, Role.TEACHER],
       },
+      OR: search
+        ? [
+            {
+              name: {
+                contains: search,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
+            {
+              nisn: {
+                contains: search,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            },
+          ]
+        : undefined,
     };
 
     const [total, users] = await Promise.all([

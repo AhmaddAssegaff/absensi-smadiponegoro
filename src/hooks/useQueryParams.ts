@@ -17,6 +17,7 @@ interface useQueryParamsOptions<SortBy extends string> {
   defaultOrder?: Order;
   defaultLimit?: number;
   defaultPage?: number;
+  defaultSearch?: string;
 }
 
 export const useQueryParams = <
@@ -27,19 +28,21 @@ export const useQueryParams = <
   defaultOrder = "desc",
   defaultLimit = 10,
   defaultPage = 1,
+  defaultSearch = "",
 }: useQueryParamsOptions<SortBy> = {}) => {
   const queryParams = useSearchParams();
 
   const rawParams = Object.fromEntries(queryParams.entries());
+  const sortByParam = queryParams.get("sortBy");
+  const orderParam = queryParams.get("order");
+  const searchParam = queryParams.get("search");
 
+  const currentSearch = String(queryParams.get("search") ?? defaultSearch);
   const currentLimit = Number(queryParams.get("limit") ?? defaultLimit);
   const currentPage = Math.max(
     1,
     Number(queryParams.get("page") ?? defaultPage),
   );
-
-  const sortByParam = queryParams.get("sortBy");
-  const orderParam = queryParams.get("order");
 
   const currentSortBy: SortBy = validSortBy.includes(sortByParam as SortBy)
     ? (sortByParam as SortBy)
@@ -55,6 +58,7 @@ export const useQueryParams = <
     limit: String(currentLimit),
     sortBy: currentSortBy,
     order: currentOrder,
+    searchParam,
   };
 
   return {
@@ -62,6 +66,7 @@ export const useQueryParams = <
     currentLimit,
     currentSortBy,
     currentOrder,
+    currentSearch,
     orderedQuery,
     rawParams,
   };

@@ -1,6 +1,6 @@
 import { adminProcedure } from "@/server/api/trpc";
 import { Role } from "@/shared/constants/role";
-import { paginationTeacherSchema } from "@/shared/validators/admin/paginationGetAllUser";
+import { paginationTeacherSchema } from "@/shared/validators/admin/paginationGetAllUserTacher&Admin";
 
 export const GetAllTeacher = adminProcedure
   .input(paginationTeacherSchema)

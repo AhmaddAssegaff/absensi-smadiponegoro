@@ -7,21 +7,37 @@ import { TableCell } from "@/components/ui/table";
 import type { GetAllStudentsOutput } from "@/shared/types/trpc";
 import { Input } from "@/components/ui/input";
 import { dateFormater } from "@/helper";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ListStudentsAdminPage() {
-  const { currentPage, currentSortBy, currentOrder } = useQueryParams({
-    validSortBy: ["name", "nisn", "role", "updatedAt"],
-    defaultSortBy: "updatedAt",
-  });
+  const { currentPage, currentSortBy, currentOrder, currentSearch, rawParams } =
+    useQueryParams({
+      validSortBy: ["name", "nisn", "role", "updatedAt"],
+      defaultSortBy: "updatedAt",
+    });
+
+  const [searchInput, setSearchInput] = useState(currentSearch);
+
+  const router = useRouter();
+
+  const handleSearch = (value: string) => {
+    const params = new URLSearchParams(rawParams);
+    params.set("search", value);
+    params.set("page", "1");
+
+    router.push(`?${params.toString()}`);
+  };
 
   const { data, isLoading, error } = api.admin.GetAllStudents.useQuery({
     limit: 10,
     page: currentPage,
     sortBy: currentSortBy,
     order: currentOrder,
+    search: currentSearch,
   });
 
-  console.log(data);
+  // console.log(data);
 
   const columns = [
     { key: "name", label: "Nama", sortable: true },
@@ -50,7 +66,17 @@ export default function ListStudentsAdminPage() {
             Lihat semua data siswa dengan fitur sorting dan pagination click
             judul table untuk sorting.
           </p>
-          <Input type="search" placeholder="Cari Nama muird" />
+          <Input
+            className="bg-white"
+            type="search"
+            placeholder="Cari Nama murid"
+            value={searchInput}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearchInput(value);
+              handleSearch(value);
+            }}
+          />
         </div>
         <TableWrapper<GetAllStudentsOutput>
           columns={columns}
