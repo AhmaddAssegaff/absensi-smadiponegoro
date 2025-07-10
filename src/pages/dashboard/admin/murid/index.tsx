@@ -1,13 +1,14 @@
 import { PageContainer } from "@/components/layout/pageContainer";
 import { SectionContiner } from "@/components/layout/sectionContiner";
 import { useQueryParams } from "@/hooks/useQueryParams";
+import { useDebounce } from "@/hooks/useDebounce";
 import { api } from "@/utils/api";
 import { type Column, TableWrapper } from "@/components/layout/tableWrapper";
 import { TableCell } from "@/components/ui/table";
 import type { GetAllStudentsOutput } from "@/shared/types/trpc";
 import { Input } from "@/components/ui/input";
 import { dateFormater } from "@/helper";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ListStudentsAdminPage() {
@@ -18,16 +19,32 @@ export default function ListStudentsAdminPage() {
     });
 
   const [searchInput, setSearchInput] = useState(currentSearch);
+  const debouncedSearch = useDebounce(searchInput, 500);
 
   const router = useRouter();
+  const firstMountRef = useRef(true);
 
-  const handleSearch = (value: string) => {
-    const params = new URLSearchParams(rawParams);
-    params.set("search", value);
-    params.set("page", "1");
+  useEffect(() => {
+    if (firstMountRef.current) {
+      firstMountRef.current = false;
+      return;
+    }
 
-    router.push(`?${params.toString()}`);
-  };
+    if (debouncedSearch !== currentSearch) {
+      const params = new URLSearchParams(rawParams);
+
+      if (debouncedSearch) {
+        params.set("search", debouncedSearch);
+        params.set("page", "1");
+      } else {
+        params.delete("search");
+        params.set("page", "1");
+      }
+
+      console.log("Redirecting to:", params.toString());
+      router.push(`?${params.toString()}`);
+    }
+  }, [debouncedSearch]);
 
   const { data, isLoading, error } = api.admin.GetAllStudents.useQuery({
     limit: 10,
@@ -36,8 +53,6 @@ export default function ListStudentsAdminPage() {
     order: currentOrder,
     search: currentSearch,
   });
-
-  // console.log(data);
 
   const columns = [
     { key: "name", label: "Nama", sortable: true },
@@ -71,11 +86,7 @@ export default function ListStudentsAdminPage() {
             type="search"
             placeholder="Cari Nama murid"
             value={searchInput}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSearchInput(value);
-              handleSearch(value);
-            }}
+            onChange={(e) => setSearchInput(e.target.value)} // hanya ubah state biasa
           />
         </div>
         <TableWrapper<GetAllStudentsOutput>
